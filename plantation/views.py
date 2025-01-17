@@ -10,22 +10,29 @@ from django.urls import reverse
 
 def homepage(request):
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-        search_query = request.GET.get('search', '')
+        search_query = request.GET.get('search', '').strip()  # Get and sanitize input
         
+        # Filter plantations by name
         plantations = Plantation.objects.filter(
             name__icontains=search_query
-        ).select_related('owner')
+        ).select_related('owner')  # Use select_related for efficiency
 
-        results = []
-        for plantation in plantations:
-            plantation_data = {
+        # Format the response data
+        results = [
+            {
                 'id': plantation.id,
                 'name': plantation.name,
                 'owner_name': plantation.owner.username,
             }
-            results.append(plantation_data)
+            for plantation in plantations
+        ]
 
         return JsonResponse({'results': results})
+    
+    # Default: Show all plantations
+    plantations = Plantation.objects.all().select_related('owner')
+    return render(request, "plantation/homepage.html", {'plantations': plantations})
+
 
     # Show all plantations by default
     plantations = Plantation.objects.all().select_related('owner')
