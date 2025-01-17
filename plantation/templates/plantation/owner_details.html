@@ -1,0 +1,31 @@
+{% extends 'plantation/base.html' %}
+
+{% block title %}Owner Details{% endblock %}
+
+{% block content %}
+    <h2>Owner Details</h2>
+    <p><strong>Name:</strong> {{ owner.username }}</p>
+    
+    {% if user.is_authenticated and owner == user %}
+        <p><strong>Email:</strong> {{ owner.email }}</p>
+    {% else %}
+        <p><strong>Email:</strong> <span style="color: #888;">(Hidden for visitors)</span></p>
+    {% endif %}
+    
+    <h3>Plantations:</h3>
+    <ul>
+        {% for plantation in plantations %}
+            <li>
+                <a href="{% url 'plantation_details' plantation.id %}">
+                    {{ plantation.name }}
+                </a>
+            </li>
+        {% empty %}
+            <li>No plantations available for this owner.</li>
+        {% endfor %}
+    </ul>
+
+    {% if user.is_authenticated and owner == user %}
+        <a href="{% url 'logout' %}">Logout</a>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+<!-- plantation_details.html -->
+{% extends 'plantation/base.html' %}
+
+{% block title %}Plantation Details{% endblock %}
+
+{% block content %}
+  <h2>{{ plantation.name }}</h2>
+  <p>Planted on: {{ plantation.plantation_date }}</p>
+  <p>{{ plantation.description }}</p>
+  <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" />
+{% endblock %}
