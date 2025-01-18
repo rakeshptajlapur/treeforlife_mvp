@@ -3,30 +3,39 @@
 {% block title %}Homepage{% endblock %}
 
 {% block content %}
-<h2>Plantation Search</h2>
+    <div class="container" style="background-color: rgb(213, 249, 215);max-width: 80%; border: 1px grey solid;">
+        <h2 class="text-center my-4">All Plantation Search</h2>
 
-<!-- Search Box -->
+        <!-- Search Box -->
+        <div class="container d-flex justify-content-center my-4" style="max-width: 70%;">
+            <input type="text" id="searchBox" class="form-control form-control-lg" placeholder="Search plantations..." /> 
+        </div>
 
-<input type="text" id="searchBox" placeholder="Search plantations..." />
-<div id="resultsContainer"></div>
+        <div class="container d-flex justify-content-center my-4" style="max-width: 70%;" id="resultsContainer" class="my-4"></div>
 
-<!-- Plantation Table -->
-<table id="plantation-table">
-    <thead>
-        <tr>
-            <th>Sl No.</th>
-            <th>Plant Name</th>
-            <th>Owner Name</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for plantation in plantations %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td><a href="{% url 'plantation_details' plantation.id %}">{{ plantation.name }}</a></td>
-                <td><a href="{% url 'owner_details' plantation.owner.username %}">{{ plantation.owner.username }}</a></td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        
+
+
+        <!-- Plantation Table -->
+        <div class="container" style="max-width: 70%; text-align: left;">
+            <table id="plantation-table" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Sl No.</th>
+                        <th>Plant Name</th>
+                        <th>Owner Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plantation in plantations %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><a href="{% url 'plantation_details' plantation.id %}">{{ plantation.name }}</a></td>
+                            <td><a href="{% url 'owner_details' plantation.owner.username %}">{{ plantation.owner.username }}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}
