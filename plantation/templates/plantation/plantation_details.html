@@ -8,4 +8,15 @@
   <p>Planted on: {{ plantation.plantation_date }}</p>
   <p>{{ plantation.description }}</p>
   <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" />
+
+  <h3>Timelines</h3>
+  {% for timeline in plantation.timelines.all %}
+      <div>
+          <h4><a href="{% url 'timeline_detail' plantation_id=plantation.id timeline_id=timeline.id %}">
+              {{ timeline.activity_date }}
+          </a></h4>
+          <p>{{ timeline.description|truncatewords:20 }}</p>
+      </div>
+  {% endfor %}
 {% endblock %}
+

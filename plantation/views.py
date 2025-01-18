@@ -2,10 +2,17 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+#from django.contrib.auth.decorators import login_required
 from .models import Plantation  # Ensure this import is added
 from django.http import JsonResponse
 from django.urls import reverse
+from .models import Timeline 
+from .models import Comment
+from django.contrib.auth.decorators import login_required
+from django.http import Http404
+from django.contrib import messages
+
+
 
 
 def homepage(request):
@@ -87,6 +94,60 @@ def owner_details(request, username):
     })
 
 
+#def plantation_details(request, id):
+ #   plantation = get_object_or_404(Plantation, id=id)
+  #  return render(request, "plantation/plantation_details.html", {'plantation': plantation})
+
 def plantation_details(request, id):
     plantation = get_object_or_404(Plantation, id=id)
-    return render(request, "plantation/plantation_details.html", {'plantation': plantation})
+    timelines = plantation.timelines.order_by('-activity_date')  # Fetch timelines
+    return render(request, "plantation/plantation_details.html", {
+        'plantation': plantation,
+        'timelines': timelines,
+    })
+
+@login_required
+def add_comment(request, plantation_id, timeline_id):
+    # Get the timeline and plantation
+    timeline = get_object_or_404(Timeline, id=timeline_id)
+    plantation = timeline.plantation
+
+    # Only allow plantation owner or admins to add comments
+    if not (request.user == plantation.owner or request.user.is_staff):
+        raise Http404("You are not authorized to comment on this timeline.")
+
+    if request.method == "POST":
+        text = request.POST.get("text")
+        if text:  # Ensure the comment is not empty
+            Comment.objects.create(timeline=timeline, user=request.user, text=text)
+            messages.success(request, "Your comment has been added successfully!")
+        else:
+            messages.error(request, "Comment cannot be empty!")
+
+    # Redirect back to the timeline details page
+    return redirect("timeline_detail", plantation_id=plantation.id, timeline_id=timeline.id)
+
+
+
+#def timeline_detail(request, plantation_id):
+ #   plantation = get_object_or_404(Plantation, id=plantation_id)
+  #  return render(request, 'plantation/timeline_detail.html', {'plantation': plantation})
+
+def timeline_detail(request, plantation_id, timeline_id):
+    # Fetch the plantation and timeline
+    plantation = get_object_or_404(Plantation, id=plantation_id)
+    timeline = get_object_or_404(Timeline, id=timeline_id, plantation=plantation)
+
+    # Check if the user is authorized to add comments (only owner or admin)
+    can_add_comment = request.user == plantation.owner or request.user.is_staff
+
+    # Fetch all comments for the timeline
+    comments = timeline.comments.order_by("-created_at")
+
+    # Render the timeline details page
+    return render(request, "plantation/timeline_detail.html", {
+        "plantation": plantation,
+        "timeline": timeline,
+        "comments": comments,
+        "can_add_comment": can_add_comment,  # Pass this to the template
+    })
