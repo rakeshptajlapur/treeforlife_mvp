@@ -30,8 +30,28 @@
         </div>
         </div>
     </nav>
-    
-    <div class="container mt-4" style="flex: 1;">
+
+    <div class="container" style="max-height: 25px;margin-bottom: 0px;">
+        <div aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                {% block breadcrumbs %}
+                    {% if breadcrumbs %}
+                        {% for crumb in breadcrumbs %}
+                            {% if not forloop.last %}
+                                <li class="breadcrumb-item">
+                                    <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+                                </li>
+                            {% else %}
+                                <li class="breadcrumb-item active" aria-current="page">{{ crumb.name }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endblock %}
+
+            </ol>
+        </div>
+    </div>  
+    <div class="container " style="flex: 1;">
         {% block content %}{% endblock %}
     </div>
     

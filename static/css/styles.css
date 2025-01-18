@@ -218,3 +218,20 @@ footer {
 }
 
 
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+  content: '>';
+  color: #6c757d;
+}
+.breadcrumb-item a {
+  text-decoration: none;
+  color: #007bff;
+}
+.breadcrumb-item a:hover {
+  text-decoration: underline;
+}
