@@ -1,86 +1,43 @@
 
-# Tree for Life MVP
+# Plantation Management System
 
-Tree for Life is a Django-based application designed to help plantation owners manage their plantations and provide visitors with an interactive way to explore them.
-
----
+This is a simple web application for managing plantations and timelines. It allows plantation owners to track activities, add timelines, and view comments.
 
 ## Features
 
-### For Visitors:
-- **Browse Plantations**: View a list of plantations and their details.
-- **Owner Information**: Visitors can view plantation owners' names, but sensitive details like emails are hidden.
+- Timelines are displayed and clickable.
+- Owners can add comments on their plantation timelines.
+- Admins and owners have the ability to manage comments.
 
-### For Plantation Owners:
-- **Authentication**: Owners can log in to view their profile and plantation details.
-- **Personalized Dashboard**: Owners can see all plantations they own.
-- **Email Visibility**: Owners can view their own email address, which remains hidden from visitors.
+## Installation
 
-### For Admins:
-- **User Management**: Add, edit, and delete users directly from the admin panel.
-- **Plantation Management**: Manage plantations and their assigned owners through the admin interface.
-- **Content Control**: Control over displayed data to ensure privacy and consistency.
-
----
-
-## Installation Guide
-
-### Prerequisites
-- Python (>= 3.8)
-- Git
-
-### Steps to Set Up the Project
-1. **Clone the Repository**  
-   Clone the repository to your local machine:
+1. Clone this repository:
    ```bash
-   git clone https://github.com/rakeshptajlapur/treeforlife_mvp.git
-   cd treeforlife_mvp
+   git clone https://github.com/rakeshptajlapur/plantation-management.git
    ```
 
-2. **Set Up a Virtual Environment**  
-   Create and activate a virtual environment:
+2. Navigate to the project directory:
    ```bash
-   python -m venv venv
-   source venv/bin/activate   # On Windows: venv\Scripts\activate
+   cd plantation-management
    ```
 
-3. **Install Dependencies**  
-   Install the required dependencies using pip:
+3. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Apply Migrations**  
-   Set up the database by applying migrations:
-   ```bash
-   python manage.py migrate
-   ```
-
-5. **Start the Development Server**  
-   Run the server locally:
+4. Run the application:
    ```bash
    python manage.py runserver
    ```
 
-6. **Access the Application**  
-   Visit the application at `http://127.0.0.1:8000/`.
+5. Open the application in your browser at `http://127.0.0.1:8000/`.
 
----
+## Contact
 
-## Admin Panel Access
+For support, inquiries, or collaboration, feel free to reach out to me at:
 
-1. **Create a Superuser**  
-   To access the Django admin panel, create a superuser:
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-2. **Log In to Admin Panel**  
-   Log in to the admin panel at `http://127.0.0.1:8000/admin/` using the credentials you created.
-
----
-
-## Contributing
-Feel free to fork the repository and submit pull requests for enhancements or bug fixes.
-Rakesh Kumar T
-rakeshptajlapur@gmail.com
+- **Email**: rakesh@codesiddhi.com
+- **GitHub**: [rakeshptajlapur](https://github.com/rakeshptajlapur)
+- **LinkedIn**: [rakeshptajlapur](https://linkedin.com/in/rakeshptajlapur)
+- **Website**: [codesiddhi.agency](https://codesiddhi.agency)
