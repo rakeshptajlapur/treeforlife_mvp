@@ -121,13 +121,29 @@ def add_comment(request, plantation_id, timeline_id):
     if request.method == "POST":
         text = request.POST.get("text")
         if text:  # Ensure the comment is not empty
-            Comment.objects.create(timeline=timeline, user=request.user, text=text)
+            new_comment = Comment.objects.create(timeline=timeline, user=request.user, text=text)
+            
+            # Check if the request is AJAX
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                # Return a JSON response
+                return JsonResponse({
+                    "status": "success",
+                    "comment": {
+                        "user": request.user.username,
+                        "text": new_comment.text,
+                        "created_at": new_comment.created_at.strftime('%Y-%m-%d %H:%M'),
+                    }
+                })
+            
             messages.success(request, "Your comment has been added successfully!")
         else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({"status": "error", "message": "Comment cannot be empty!"}, status=400)
             messages.error(request, "Comment cannot be empty!")
 
-    # Redirect back to the timeline details page
+    # Redirect back to the timeline details page for non-AJAX requests
     return redirect("timeline_detail", plantation_id=plantation.id, timeline_id=timeline.id)
+
 
 
 
@@ -161,18 +177,22 @@ def timeline_detail(request, plantation_id, timeline_id):
 
 
 
-def timeline_detail_ajax(request, plantation_id, timeline_id):
+def timeline_details_ajax(request, plantation_id, timeline_id):
     plantation = get_object_or_404(Plantation, id=plantation_id)
-    timeline = get_object_or_404(Timeline, id=timeline_id, plantation=plantation)
-    comments = timeline.comments.order_by("-created_at")
-    can_add_comment = request.user == plantation.owner or request.user.is_staff
-
-    # Render only the content (without header/footer)
-    html = render_to_string("plantation/timeline_detail_content.html", {
-        "plantation": plantation,
-        "timeline": timeline,
-        "comments": comments,
-        "can_add_comment": can_add_comment,
-    })
+    timeline = get_object_or_404(Timeline, id=timeline_id)
     
-    return JsonResponse({"html": html})
+    # Fetch all comments associated with this timeline
+    comments = timeline.comments.all()
+
+    # Check if the user is the owner
+    is_owner = plantation.owner == request.user
+
+    return render(
+        request,
+        'plantation/timeline_detail_content.html',
+        {
+            'timeline': timeline,
+            'comments': comments,
+            'is_owner': is_owner,
+        }
+    )

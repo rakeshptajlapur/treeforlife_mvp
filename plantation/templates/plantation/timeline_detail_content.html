@@ -1,19 +1,22 @@
-<h5><i>Update Details:</i></h5>
-<hr>
-<h5>{{ timeline.activity_date }}</h5>
-<p>{{ timeline.description }}</p>
-
-<h4>Comments:</h4>
-{% for comment in comments %}
-    <p>{{ comment.user.username }}: {{ comment.text }}</p>
-{% empty %}
-    <p>No comments yet.</p>
-{% endfor %}
-
-{% if can_add_comment %}
-    <form method="POST" action="{% url 'add_comment' plantation.id timeline.id %}">
-        {% csrf_token %}
-        <textarea name="text" placeholder="Add a comment"></textarea>
-        <button type="submit">Submit</button>
-    </form>
-{% endif %}
+<div class="timeline-details">
+    <h4>{{ timeline.activity_date }}</h4>
+    <p>{{ timeline.description }}</p>
+  
+    <!-- Display comments -->
+    <h5>Comments:</h5>
+    <ul id="comments-list">
+      {% for comment in comments %}
+        <li><strong>{{ comment.user.username }}</strong>: {{ comment.text }} ({{ comment.created_at }})</li>
+      {% empty %}
+        <li>No comments yet.</li>
+      {% endfor %}
+    </ul>
+  
+    <!-- Show comment form if the user is the owner -->
+    {% if is_owner %}
+      <button id="open-details-btn">Open details to add comment</button>
+    {% else %}
+      <p>You are not authorized to comment on this plantation. Only the owner can add comments.</p>
+    {% endif %}
+  </div>
+  
