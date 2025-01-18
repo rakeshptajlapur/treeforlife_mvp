@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="container" style="background-color: rgb(213, 249, 215);max-width: 80%; border: 1px grey solid;">
-        <h2 class="text-center my-4">All Plantation Search</h2>
+        <h2 class="text-center my-4">All Plantation Global Search</h2>
 
         <!-- Search Box -->
         <div class="container d-flex justify-content-center my-4" style="max-width: 70%;">
@@ -23,7 +23,7 @@
                     <tr>
                         <th>Sl No.</th>
                         <th>Plant Name</th>
-                        <th>Owner Name</th>
+                        <th>Owner | <i>Username</i></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,7 +31,7 @@
                         <tr>
                             <td>{{ forloop.counter }}</td>
                             <td><a href="{% url 'plantation_details' plantation.id %}">{{ plantation.name }}</a></td>
-                            <td><a href="{% url 'owner_details' plantation.owner.username %}">{{ plantation.owner.username }}</a></td>
+                            <td><a href="{% url 'owner_details' plantation.owner.username %}">{{ plantation.owner.first_name }} | <i>{{ plantation.owner.username }}</i>  </a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

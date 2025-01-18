@@ -17,15 +17,15 @@
             <a class="navbar-brand" href="/">TreeforLife | <i>Plantation Management System</i> </a>
             
             <!-- Navbar links aligned to the right -->
-            <div class="d-flex ms-auto">
-                {% if user.is_authenticated %}
-                    <!-- If the user is authenticated, show Logout link -->
-                    <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
-                {% else %}
-                    <!-- If the user is not authenticated, show Login link -->
-                    <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a>
-                {% endif %}
-            </div>
+        <div class="d-flex ms-auto">
+            {% if user.is_authenticated %}
+                <span class="navbar-text text-white">Hey! {{ user.first_name }} Welcome Back!</span>
+                <a href="{% url 'owner_details' username=user.username %}" class="btn btn-outline-info mx-2">My Profile</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a>
+            {% endif %}
+        </div>
         </div>
     </nav>
     
@@ -35,7 +35,7 @@
     
     <!-- Footer -->
     <footer style="background-color: #343a40; color: white; text-align: center; padding: 1rem;">
-        <p>&copy; 2025 Rakesh Kumar T| <a href="https://codesiddhi.agency" target="_blank" style="color: white; text-decoration: none;">Codesiddhi.Agency</a></p>
+        <p>&copy; 2025 Rakesh Kumar T | <a href="https://codesiddhi.agency" target="_blank" style="color: white; text-decoration: none;">Codesiddhi.Agency</a></p>
     </footer>
 
     <!-- Bootstrap JS -->
