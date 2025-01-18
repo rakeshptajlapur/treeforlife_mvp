@@ -55,7 +55,7 @@ ROOT_URLCONF = 'plant_booking.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ ],  # Root-level templates
+        'DIRS': [ BASE_DIR / 'plantation/templates',], 
         'APP_DIRS': True,  # Allows Django to locate templates inside apps
         'OPTIONS': {
             'context_processors': [

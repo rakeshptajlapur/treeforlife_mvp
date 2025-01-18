@@ -1,36 +1,65 @@
-<!-- timeline_detail.html -->
 {% extends 'plantation/base.html' %}
 
 {% block title %}Timeline Details{% endblock %}
 
 {% block content %}
-    <h2>Timeline for {{ plantation.name }}</h2>
-    
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li class="{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    
-    <p>Date: {{ timeline.activity_date }}</p>
-    <p>Description: {{ timeline.description }}</p>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Left Section (30%) - Plantation Details -->
+        <div class="col-md-3" style="border-right: 0 solid #ddd; padding-right: 20px;">
+            <div class="card mb-4" style="border-radius: 10px; padding: 20px; background-color: darkslategray;">
+                <div class="card-body" style="color: white;">
+                    <div class="text-left mb-3">
+                        <!-- Plant Image -->
+                        <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                    </div>
+                    <h3 class="text-left">{{ plantation.name }}</h3>
+                    <p><strong>Planted on:</strong> {{ plantation.plantation_date }}</p>
+                    <p><strong>Description:</strong> {{ plantation.description }}</p>
+                    <hr>
+                    <p><strong>Owner-username:</strong> <a href="{% url 'owner_details' username=plantation.owner.username %}" class="text-primary">{{ plantation.owner.username }}</a></p>
+                </div>
+            </div>
+        </div>
 
-    <h3>Comments</h3>
-    <ul>
-        {% for comment in comments %}
-            <li>{{ comment.user.username }}: {{ comment.text }} ({{ comment.created_at }})</li>
-        {% endfor %}
-    </ul>
+        <!-- Right Section (70%) - Timeline and Comments -->
+        <div class="col-md-8">
+            <div class="timeline-details-card">
+                <h3>Timeline Details</h3>
+                <div class="timeline-card p-4 rounded" style="margin-bottom: 20px; background-color: salmon;">
+                    <p><strong>Date:</strong> {{ timeline.activity_date }}</p>
+                    <p><strong>Description:</strong> {{ timeline.description }}</p>
+                </div>
 
-    {% if can_add_comment %}
-        <form method="post" action="{% url 'add_comment' plantation_id=plantation.id timeline_id=timeline.id %}">
-            {% csrf_token %}
-            <textarea name="text" placeholder="Add a comment"></textarea>
-            <button type="submit">Submit</button>
-        </form>
-    {% else %}
-        <p>You are not authorized to add comments.</p>
-    {% endif %}
+                <hr class="my-4">
+
+                <h4>Comments</h4>
+                <div class="comments-section" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; border-radius: 10px; background-color: #f9f9f9;">
+                    {% for comment in comments %}
+                        <div class="comment-card" style="margin-bottom: 15px; border-left: 4px solid #007bff; padding-left: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <strong>{{ comment.user.username }}:</strong>
+                            <p>{{ comment.text }}</p>
+                            <small class="text-muted">{{ comment.created_at }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Add Comment Form -->
+                {% if can_add_comment %}
+                    <form method="post" action="{% url 'add_comment' plantation_id=plantation.id timeline_id=timeline.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <textarea name="text" class="form-control" placeholder="Add a comment" rows="3" style="border-radius: 8px;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="border-radius: 8px; margin-top: 10px;">Submit</button>
+                    </form>
+                {% else %}
+                    <p class="alert alert-warning mt-3">You are not authorized to add comments.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

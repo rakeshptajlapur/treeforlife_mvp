@@ -17,70 +17,25 @@
       <p class="text-white"><strong>Owner:</strong> <a href="{% url 'owner_details' username=plantation.owner.username %}" class="text-white">{{ plantation.owner.username }}</a></p>
     </div>
 
-    <!-- Timeline List (30%) -->
-    <div class="col-md-3 timeline">
+    <!-- Timeline List Section (30%) -->
+    <div class="col-md-8 timeline" style="height: 400px; overflow-y: auto;">
       <h3>Timelines</h3>
       <p>Click on a timeline to view its details and add comments.</p>
       <ul class="list-group">
         {% for timeline in plantation.timelines.all %}
-          <li class="list-group-item">
-            <a href="#" class="timeline-link" data-plantation-id="{{ plantation.id }}" data-timeline-id="{{ timeline.id }}">
-              {{ timeline.activity_date }}
-            </a>
-            <p>{{ timeline.description|truncatewords:20 }}</p>
+          <li class="list-group-item d-flex justify-content-between">
+            <div>
+              <a href="{% url 'timeline_details' plantation_id=plantation.id timeline_id=timeline.id %}" class="timeline-link">
+                <strong>{{ timeline.activity_date }}</strong>
+              </a>
+              <p>{{ timeline.description|truncatewords:20 }}</p>
+            </div>
+            <a href="{% url 'timeline_details' plantation_id=plantation.id timeline_id=timeline.id %}" class="btn btn-info btn-sm" style="text-align: center;color:white;padding: 20px 50px; background-color:rgb(76, 208, 76);">See Details</a>
           </li>
         {% endfor %}
       </ul>
     </div>
 
-    <!-- Timeline Details (50%) -->
-    <div id="timeline-details-container" class="col-md-5 timeline-details">
-      <h3><i>Update Details</i></h3>
-      <hr>
-      <p>Click on a timeline from the left to view its details (description, images, comments, etc.).</p>
-      <!-- Placeholder for timeline details -->
-    </div>
   </div>
 </div>
-
-<script>
-$(document).ready(function () {
-  // Load timeline details via AJAX
-  $('.timeline-link').on('click', function (event) {
-    event.preventDefault();
-    
-    const plantationId = $(this).data('plantation-id');
-    const timelineId = $(this).data('timeline-id');
-
-    // Fetch timeline details and comments
-    $.ajax({
-      url: `/plantation/${plantationId}/timeline/${timelineId}/ajax/`,
-      method: 'GET',
-      success: function (response) {
-        // Ensure that only the timeline details content is updated (comments, description, etc.)
-        $('#timeline-details-container').html(response);
-      },
-      error: function () {
-        alert('Error occurred while fetching the timeline details.');
-      }
-    });
-
-    // Highlight active timeline
-    $('.timeline-link').removeClass('active');
-    $(this).addClass('active');
-  });
-
-  // Redirect to timeline details page to add comment (for plantation owners only)
-  $(document).on('click', '#open-details-to-comment', function (event) {
-    event.preventDefault();
-    
-    const plantationId = $(this).data('plantation-id');
-    const timelineId = $(this).data('timeline-id');
-    
-    // Redirect to timeline details page for adding comments
-    window.location.href = `/plantation/${plantationId}/timeline/${timelineId}/`;
-  });
-});
-
-</script>
 {% endblock %}

@@ -142,7 +142,9 @@ def add_comment(request, plantation_id, timeline_id):
             messages.error(request, "Comment cannot be empty!")
 
     # Redirect back to the timeline details page for non-AJAX requests
-    return redirect("timeline_detail", plantation_id=plantation.id, timeline_id=timeline.id)
+    return redirect("timeline_details", plantation_id=plantation.id, timeline_id=timeline.id)
+
+
 
 
 
@@ -151,30 +153,25 @@ def add_comment(request, plantation_id, timeline_id):
  #   plantation = get_object_or_404(Plantation, id=plantation_id)
   #  return render(request, 'plantation/timeline_detail.html', {'plantation': plantation})
 
-def timeline_detail(request, plantation_id, timeline_id):
-    # Fetch the plantation and timeline
+
+
+@login_required
+def timeline_details(request, plantation_id, timeline_id):
     plantation = get_object_or_404(Plantation, id=plantation_id)
     timeline = get_object_or_404(Timeline, id=timeline_id, plantation=plantation)
+    comments = timeline.comments.all()  # Assuming related_name="comments" for the Timeline model
 
-    # Check if the user is authorized to add comments (only owner or admin)
-    can_add_comment = request.user == plantation.owner or request.user.is_staff
+    # Check if the current user is the owner or has permission to comment
+    can_add_comment = False
+    if plantation.owner == request.user or request.user.is_staff:
+        can_add_comment = True
 
-    # Fetch all comments for the timeline
-    comments = timeline.comments.order_by("-created_at")
-
-    # Check if the request is an AJAX request
-    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-        # Handle AJAX-specific logic here if needed
-        pass
-
-    # Render the timeline details page
-    return render(request, "plantation/timeline_detail.html", {
-        "plantation": plantation,
-        "timeline": timeline,
-        "comments": comments,
-        "can_add_comment": can_add_comment,  # Pass this to the template
+    return render(request, 'plantation/timeline_details.html', {
+        'plantation': plantation,
+        'timeline': timeline,
+        'comments': comments,
+        'can_add_comment': can_add_comment,
     })
-
 
 
 def timeline_details_ajax(request, plantation_id, timeline_id):

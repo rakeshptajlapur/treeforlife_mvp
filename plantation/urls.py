@@ -9,9 +9,9 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('owner-details/<str:username>/', views.owner_details, name='owner_details'),
     path('plantation-details/<int:id>/', views.plantation_details, name='plantation_details'),
-    path('plantation/<int:plantation_id>/timeline/<int:timeline_id>/', views.timeline_detail, name='timeline_detail'),
+    path('plantation/<int:plantation_id>/timeline/<int:timeline_id>/', views.timeline_details, name='timeline_details'),
     path('plantation/<int:plantation_id>/timeline/<int:timeline_id>/add_comment/', views.add_comment, name='add_comment'),
-    #path('plantation/<int:plantation_id>/timeline/<int:timeline_id>/ajax/', views.timeline_detail_ajax, name='timeline_detail_ajax'),
+    #path('plantation/<int:plantation_id>/timeline/<int:timeline_id>/add_comment/', views.add_comment, name='add_comment'),
     path('plantation/<int:plantation_id>/timeline/<int:timeline_id>/ajax/', views.timeline_details_ajax, name='timeline_details_ajax'),
 
 ]
