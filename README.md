@@ -1,13 +1,46 @@
 
 # Plantation Management System
 
-This is a simple web application for managing plantations and timelines. It allows plantation owners to track activities, add timelines, and view comments.
+## Project Overview
 
-## Features
+The Plantation Management System is a web application designed to help plantation owners manage their plantations, activities, and timelines. The system allows plantation owners to view and manage their plantations, track activities, and interact with timelines through comments. Admins can manage users, plantations, and timelines from the backend.
 
-- Timelines are displayed and clickable.
-- Owners can add comments on their plantation timelines.
-- Admins and owners have the ability to manage comments.
+## Key Features
+
+### Admin Management:
+- Admins can manage users (plantation owners), plantations, and timelines through the Django admin panel.
+- Admins can assign plantation owners to plantations.
+
+### Plantation Owners:
+- Plantation owners can view their plantations in a list.
+- Owners can view details of their own plantations and timelines.
+- Owners can view comments on timelines and add new comments to them.
+- Only plantation owners or admins can add comments on timelines.
+- Plantation owners must log in to the system to manage their plantations and timelines.
+
+### Visitors:
+- Visitors can view plantation details and owner details (with sensitive details hidden).
+- Visitors can view comments on timelines but cannot add comments.
+
+### Timeline Management:
+- Plantation owners can view the timeline of their plantations.
+- Admins can manage timelines via the backend.
+
+### Search Filter:
+- Users can search for plantations by name.
+
+### Backend Admin Features:
+- Admins can add, update, and delete plantations, timelines, and comments from the Django admin interface.
+- Admins can manage plantation ownership assignments.
+
+## Features Breakdown
+
+- **Plantation Overview**: Plantation owners can view a list of plantations assigned to them, and visitors can search plantations by name.
+- **Timeline Details**: Owners can see their plantation's timeline and interact with the comments section. Visitors can only see the comments but cannot add them.
+- **Admin Control**: Admins have full control over the system, including managing plantation owners, plantations, timelines, and comments.
+- **Search and Filter**: The system provides a search filter for users to find plantations by name easily.
+- **Login for Plantation Owners**: Plantation owners are required to log in before accessing their plantation details and managing timelines and comments.
+
 
 ## Installation
 
