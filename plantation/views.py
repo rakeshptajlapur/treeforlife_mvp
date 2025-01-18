@@ -103,7 +103,7 @@ def add_comment(request, plantation_id, timeline_id):
 
     return redirect("timeline_details", plantation_id=plantation.id, timeline_id=timeline.id)
 
-@login_required
+#@login_required
 def timeline_details(request, plantation_id, timeline_id):
     plantation = get_object_or_404(Plantation, id=plantation_id)
     timeline = get_object_or_404(Timeline, id=timeline_id, plantation=plantation)
