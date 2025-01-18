@@ -11,6 +11,8 @@ from .models import Comment
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.contrib import messages
+from django.template.loader import render_to_string
+
 
 
 
@@ -144,6 +146,11 @@ def timeline_detail(request, plantation_id, timeline_id):
     # Fetch all comments for the timeline
     comments = timeline.comments.order_by("-created_at")
 
+    # Check if the request is an AJAX request
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        # Handle AJAX-specific logic here if needed
+        pass
+
     # Render the timeline details page
     return render(request, "plantation/timeline_detail.html", {
         "plantation": plantation,
@@ -151,3 +158,21 @@ def timeline_detail(request, plantation_id, timeline_id):
         "comments": comments,
         "can_add_comment": can_add_comment,  # Pass this to the template
     })
+
+
+
+def timeline_detail_ajax(request, plantation_id, timeline_id):
+    plantation = get_object_or_404(Plantation, id=plantation_id)
+    timeline = get_object_or_404(Timeline, id=timeline_id, plantation=plantation)
+    comments = timeline.comments.order_by("-created_at")
+    can_add_comment = request.user == plantation.owner or request.user.is_staff
+
+    # Render only the content (without header/footer)
+    html = render_to_string("plantation/timeline_detail_content.html", {
+        "plantation": plantation,
+        "timeline": timeline,
+        "comments": comments,
+        "can_add_comment": can_add_comment,
+    })
+    
+    return JsonResponse({"html": html})

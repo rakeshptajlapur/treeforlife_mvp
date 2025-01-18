@@ -1,22 +1,88 @@
-<!-- plantation_details.html -->
 {% extends 'plantation/base.html' %}
 
 {% block title %}Plantation Details{% endblock %}
 
 {% block content %}
-  <h2>{{ plantation.name }}</h2>
-  <p>Planted on: {{ plantation.plantation_date }}</p>
-  <p>{{ plantation.description }}</p>
-  <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" />
-
-  <h3>Timelines</h3>
-  {% for timeline in plantation.timelines.all %}
-      <div>
-          <h4><a href="{% url 'timeline_detail' plantation_id=plantation.id timeline_id=timeline.id %}">
-              {{ timeline.activity_date }}
-          </a></h4>
-          <p>{{ timeline.description|truncatewords:20 }}</p>
+<div class="container">
+  <div class="row">
+    <!-- Sidebar (20%) -->
+    <div class="col-md-3 sidebar">
+      <!-- Plantation Image (Circular) -->
+      <div class="text-left">
+        <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" class="rounded-circle" width="150">
       </div>
-  {% endfor %}
-{% endblock %}
 
+      <!-- Plantation Title -->
+      <h2 class="text-white">{{ plantation.name }}</h2>
+
+      <!-- Plantation Date -->
+      <p class="text-white"><strong>Planted on:</strong> {{ plantation.plantation_date }}</p>
+
+      <!-- Plantation Description -->
+      <p class="text-white">{{ plantation.description }}</p>
+
+      <hr>
+
+      <!-- Owner Details -->
+      <p class="text-white"><strong>Owner:</strong> <a href="{% url 'owner_details' username=plantation.owner.username %}" class="text-white">{{ plantation.owner.username }}</a></p>
+    </div>
+
+    <!-- Timeline List (30%) -->
+    <div class="col-md-3 timeline">
+      <h3>Timelines</h3>
+      <p>Below are the regular updates Major/Minor related to your plantation. Click on the timeline to view its details and add your comments</p>
+
+      <ul class="list-group">
+        {% for timeline in plantation.timelines.all %}
+          <li class="list-group-item">
+            <a href="#" class="timeline-link" data-plantation-id="{{ plantation.id }}" data-timeline-id="{{ timeline.id }}">
+              {{ timeline.activity_date }}
+            </a>
+            <p>{{ timeline.description|truncatewords:20 }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Timeline Details (50%) -->
+    <div id="timeline-details-container" class="col-md-5 timeline-details">
+      <h3><i>Update Details</i></h3>
+      <hr>
+      <p>Click on the timeline from the left section to view its details (description, images, comments, etc.)</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // This script listens for clicks on any timeline link
+  $('.timeline-link').on('click', function(event) {
+    event.preventDefault();
+    
+    // Get plantation and timeline IDs from data attributes
+    var plantationId = $(this).data('plantation-id');
+    var timelineId = $(this).data('timeline-id');
+
+    // Make an AJAX request to get the timeline details (partial content)
+    $.ajax({
+      url: '/plantation/' + plantationId + '/timeline/' + timelineId + '/ajax/',  // Your URL pattern for AJAX
+      method: 'GET',
+      success: function(response) {
+        // Replace the content inside the timeline details container with the returned HTML
+        $('#timeline-details-container').html(response.html);
+      }
+    });
+  });
+
+  // Add 'active' class to clicked timeline link and remove from others
+  $('.timeline-link').on('click', function(event) {
+    event.preventDefault();
+    
+    // Remove 'active' class from all timeline links
+    $('.timeline-link').removeClass('active');
+    
+    // Add 'active' class to the clicked link
+    $(this).addClass('active');
+  });
+</script>
+
+{% endblock %}

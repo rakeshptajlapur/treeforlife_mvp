@@ -1,0 +1,19 @@
+<h5><i>Update Details:</i></h5>
+<hr>
+<h5>{{ timeline.activity_date }}</h5>
+<p>{{ timeline.description }}</p>
+
+<h4>Comments:</h4>
+{% for comment in comments %}
+    <p>{{ comment.user.username }}: {{ comment.text }}</p>
+{% empty %}
+    <p>No comments yet.</p>
+{% endfor %}
+
+{% if can_add_comment %}
+    <form method="POST" action="{% url 'add_comment' plantation.id timeline.id %}">
+        {% csrf_token %}
+        <textarea name="text" placeholder="Add a comment"></textarea>
+        <button type="submit">Submit</button>
+    </form>
+{% endif %}
