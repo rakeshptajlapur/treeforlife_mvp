@@ -7,17 +7,17 @@
         <h2 class="text-center my-4">All Plantation Global Search</h2>
 
         <!-- Search Box -->
-        <div class="container d-flex justify-content-center my-4" style="max-width: 70%;">
+
+        <div style="position: relative; max-width: 100%;">
             <input type="text" id="searchBox" class="form-control form-control-lg" placeholder="Search plantations..." /> 
+            <div id="resultsContainer" class="list-group" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;  max-height: 350px; overflow-y: auto;"></div>
         </div>
-
-        <div class="container d-flex justify-content-center my-4" style="max-width: 70%;" id="resultsContainer" class="my-4"></div>
-
+        
         
 
 
         <!-- Plantation Table -->
-        <div class="container" style=" text-align: left; ">
+        <div class="container" style=" text-align: left; max-height: 450px; overflow-y: auto; ">
             <table id="plantation-table" class="table table-striped" style="border: 1px solid black;">
                 <thead>
                     <tr>

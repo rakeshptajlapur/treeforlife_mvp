@@ -1,0 +1,102 @@
+{% extends 'plantation/base.html' %}
+{% load static %}
+
+{% block title %}Manage Plantations | Corporate{% endblock %}
+
+{% block content %}
+<div style="margin: 0 auto; max-width: 1200px;">
+  <div class="row" style="display: flex; flex-wrap: nowrap; min-height: 70vh;">
+
+    <!-- Sidebar -->
+    <div class="col-md-3"
+         style="
+           background-color: #343a40; 
+           color: #fff; 
+           padding: 30px;
+           border-radius: 30px;
+         ">
+      <h5 style="margin-bottom: 30px;">
+        <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>
+        Corporate Dashboard
+      </h5>
+
+      <ul class="nav flex-column" style="gap: 10px;">
+        <li class="nav-item">
+          <a class="nav-link text-white"
+             href="{% url 'corporate_dashboard' %}"
+             style="padding-left: 0;">
+            <i class="bi bi-house-door" style="margin-right: 5px;"></i>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white"
+             href="{% url 'manage_employees' %}"
+             style="padding-left: 0;">
+            <i class="bi bi-people" style="margin-right: 5px;"></i>
+            Manage Employees
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white"
+             href="{% url 'manage_plantations' %}"
+             style="padding-left: 0;">
+            <i class="bi bi-tree-fill" style="margin-right: 5px;"></i>
+            Manage Plantations
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9"
+         style="
+           padding: 50px; 
+           background-color: #e1eefa; 
+           border-radius: 20px;
+         ">
+      <h2 class="mb-4">
+        <i class="bi bi-tree-fill" style="margin-right: 8px;"></i>
+        {{ corporate.name }} - Plantations
+      </h2>
+
+      <!-- Plantation Credits & Usage -->
+      <p>Plantation Credits: {{ corporate.plantation_credits }}</p>
+      <p>Plantations Used: {{ plantations.count }}</p>
+
+      <!-- Scrollable Table Container -->
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-hover table-bordered" style="background-color: #fff; margin-top: 20px;">
+          <thead class="table-dark">
+            <tr>
+              <th>Name</th>
+              <th>Owner</th>
+              <th style="min-width: 130px;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in plantations %}
+            <tr>
+              <td>{{ p.name }}</td>
+              <td>
+                {% if p.owner %}
+                  {{ p.owner.username }}
+                {% else %}
+                  Unassigned
+                {% endif %}
+              </td>
+              <td>
+                <!-- Assign / Reassign Button -->
+                <a href="{% url 'assign_plantation' p.id %}" class="btn btn-outline-primary btn-sm">
+                  Assign / Reassign
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

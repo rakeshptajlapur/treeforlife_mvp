@@ -22,7 +22,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('plantation.urls')),
+    path('', include('plantation.urls')),# This includes all your plantation app URLs
 
 ]
 

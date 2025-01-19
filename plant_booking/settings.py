@@ -72,7 +72,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',       
-
+                
+                # ADD THIS LINE to check if user is corporate or normal for base file header buttons:
+                'plantation.context_processors.corporate_context_processor',
             ],
         },
     },

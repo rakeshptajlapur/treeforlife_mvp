@@ -1,0 +1,105 @@
+{% extends 'plantation/base.html' %}
+{% load static %}
+
+{% block title %}Corporate Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin: 0 auto; max-width: 1200px;">
+  <div class="row" style="display: flex; flex-wrap: nowrap; min-height:70vh;">
+
+    <!-- Sidebar -->
+    <div class="col-md-3"
+         style="
+           background-color: #343a40; 
+           color: #fff; 
+           padding: 30px;
+           border-radius: 30px;
+         ">
+      <h5 style="margin-bottom: 30px;">
+        <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>
+        Corporate Dashboard
+      </h5>
+
+      <ul class="nav flex-column" style="gap: 10px;">
+        <li class="nav-item">
+          <a class="nav-link text-white"
+             href="{% url 'corporate_dashboard' %}"
+             style="padding-left: 0;">
+            <i class="bi bi-house-door" style="margin-right: 5px;"></i>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white"
+             href="{% url 'manage_employees' %}"
+             style="padding-left: 0;">
+            <i class="bi bi-people" style="margin-right: 5px;"></i>
+            Manage Employees
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white"
+             href="{% url 'manage_plantations' %}"
+             style="padding-left: 0;">
+            <i class="bi bi-tree-fill" style="margin-right: 5px;"></i>
+            Manage Plantations
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9"
+         style="
+           padding: 50px; 
+           background-color: #e1eefa; 
+           border-radius: 20px;
+         ">
+      <!-- Welcome -->
+      <h2 class="mb-4">
+        <i class="bi bi-person-circle" style="margin-right: 8px;"></i>
+        Welcome, {{ corporate.admin_user.username }}!
+      </h2>
+
+      <h5>Company: {{ corporate.name }}</h5>
+
+      <!-- Row of Stats -->
+      <div class="row" style="margin-top: 30px;">
+        <!-- Employee Credits -->
+        <div class="col-md-4 col-lg-4">
+          <div class="card shadow-sm" style="border: none;">
+            <div class="card-body">
+              <h6 class="card-subtitle text-muted">Employee Credits</h6>
+              <h4 class="card-title mt-2">{{ corporate.employee_credits }}</h4>
+              <p class="card-text text-secondary">
+                Used: {{ total_employees }}
+              </p>
+              <a href="{% url 'manage_employees' %}" class="btn btn-primary me-3">
+                <i class="bi bi-people"></i> Manage Employees
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plantation Credits -->
+        <div class="col-md-4 col-lg-4">
+          <div class="card shadow-sm" style="border: none;">
+            <div class="card-body">
+              <h6 class="card-subtitle text-muted">Plantation Credits</h6>
+              <h4 class="card-title mt-2">{{ corporate.plantation_credits }}</h4>
+              <p class="card-text text-secondary">
+                Used: {{ total_plantations }}
+              </p>
+              <a href="{% url 'manage_plantations' %}" class="btn btn-success">
+                <i class="bi bi-tree-fill"></i> Manage Plantations
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+{% endblock %}

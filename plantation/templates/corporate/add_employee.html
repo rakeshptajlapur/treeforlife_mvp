@@ -1,0 +1,105 @@
+{% extends 'plantation/base.html' %}
+{% load static %}
+
+{% block title %}Add Employee{% endblock %}
+
+{% block content %}
+<!-- 
+  Inline styles to override old .row/.col-md-3/.col-md-5 
+  Use "style" attributes so it doesn't break with your older CSS.
+-->
+
+<div style="margin: 0 auto; max-width: 1200px;">
+  <!-- Dashboard Row -->
+  <div class="row" style="display: flex; flex-wrap: nowrap; min-height:70vh ;">
+
+    <!-- Sidebar -->
+    <div class="col-md-3" 
+         style="
+           background-color: #343a40; 
+           color: #fff; 
+           min-height:  ; 
+           padding: 30px;
+           
+           border-radius: 30px;
+         ">
+      <!-- Title -->
+      <h5 style="margin-bottom: 30px;">
+        <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>
+        Corporate Dashboard
+      </h5>
+
+      <!-- Nav -->
+      <ul class="nav flex-column" style="gap: 10px;">
+        <li class="nav-item">
+          <a class="nav-link text-white" 
+             href="{% url 'corporate_dashboard' %}"
+             style="padding-left: 0;">
+            <i class="bi bi-house-door" style="margin-right: 5px;"></i>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" 
+             href="{% url 'manage_employees' %}"
+             style="padding-left: 0;">
+            <i class="bi bi-people" style="margin-right: 5px;"></i>
+            Manage Employees
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" 
+             href="{% url 'manage_plantations' %}"
+             style="padding-left: 0;">
+            <i class="bi bi-tree-fill" style="margin-right: 5px;"></i>
+            Manage Plantations
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9" 
+         style="
+           padding: 50px; 
+           background-color: #e1eefa; 
+           min-height:;
+           border-radius: 20px;
+         ">
+      <h2 class="mb-4">
+        <i class="bi bi-person-plus" style="margin-right: 8px;"></i>
+        Add Employee
+      </h2>
+
+      <form method="POST" style="max-width: 500px;">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input 
+            type="text" 
+            name="username" 
+            id="username" 
+            class="form-control" 
+            required
+          >
+        </div>
+        
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input 
+            type="email" 
+            name="email" 
+            id="email" 
+            class="form-control"
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-plus-circle"></i> Add
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

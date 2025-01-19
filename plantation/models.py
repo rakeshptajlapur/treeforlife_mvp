@@ -1,15 +1,44 @@
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here.
-# plantation/models.py
+
+class Corporate(models.Model):
+    """
+    Represents a corporate account that has its own credits
+    and an admin user.
+    """
+    admin_user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='corporate_account')
+    name = models.CharField(max_length=255)
+    plantation_credits = models.PositiveIntegerField(default=0)
+    employee_credits = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+class Employee(models.Model):
+    """
+    Represents an employee user belonging to a specific Corporate.
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='employee_profile')
+    corporate = models.ForeignKey(Corporate, on_delete=models.CASCADE, related_name='employees')
+
+    def __str__(self):
+        return f"{self.user.username} ({self.corporate.name})"
+
 class Plantation(models.Model):
     name = models.CharField(max_length=255)
     plantation_date = models.DateField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='plantation_images/')
     description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)  # Automatically set when the object is created
-    updated_at = models.DateTimeField(auto_now=True)  # Automatically set whenever the object is updated
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    corporate = models.ForeignKey(
+        Corporate, 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
+        related_name='plantations'
+    )  # New field
 
     def __str__(self):
         return self.name
@@ -22,7 +51,6 @@ class Timeline(models.Model):
 
     def __str__(self):
         return f"{self.plantation.name} - {self.activity_date}: {self.description[:30]}"
-    
 
 
 class Comment(models.Model):
@@ -35,5 +63,4 @@ class Comment(models.Model):
         return f"Comment by {self.user.username} on {self.timeline.activity_date}"
 
     class Meta:
-        ordering = ['-created_at']  # Show latest comments first
-
+        ordering = ['-created_at']

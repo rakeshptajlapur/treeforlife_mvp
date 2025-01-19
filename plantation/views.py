@@ -2,12 +2,12 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.contrib import messages
-from .models import Plantation, Timeline, Comment
+from .models import Corporate, Employee, Plantation, Timeline, Comment
 
 def homepage(request):
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
@@ -36,10 +36,24 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('owner_details', username=user.username)
+            
+            # Check if this user is a corporate admin
+            try:
+                # If this succeeds, the user has a corporate_account
+                user.corporate_account
+                # Redirect to corporate dashboard
+                return redirect('corporate_dashboard')
+            except Corporate.DoesNotExist:
+                # If we land here, user is not a corporate admin
+                return redirect('owner_details', username=user.username)
     else:
         form = AuthenticationForm()
-    breadcrumbs = [{'name': 'Home', 'url': reverse('homepage')}, {'name': 'Login', 'url': None}]
+
+    # For breadcrumbs or extra context:
+    breadcrumbs = [
+        {'name': 'Home', 'url': reverse('homepage')},
+        {'name': 'Login', 'url': None}
+    ]
     return render(request, 'registration/login.html', {'form': form, 'breadcrumbs': breadcrumbs})
 
 def logout_view(request):
@@ -142,3 +156,120 @@ def timeline_details_ajax(request, plantation_id, timeline_id):
             'is_owner': is_owner,
         }
     )
+
+
+@login_required
+def corporate_dashboard(request):
+    # Check if the current user is actually a corporate admin
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not a corporate admin.")
+
+    # Collect data to display
+    total_employees = corporate.employees.count()
+    total_plantations = corporate.plantations.count()
+
+    context = {
+        'corporate': corporate,
+        'total_employees': total_employees,
+        'total_plantations': total_plantations,
+    }
+    return render(request, 'corporate/dashboard.html', context)
+
+
+@login_required
+def manage_employees(request):
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not a corporate admin.")
+
+    # Fetch employees
+    employees = corporate.employees.select_related('user')
+
+    context = {
+        'corporate': corporate,
+        'employees': employees,
+    }
+    return render(request, 'corporate/manage_employees.html', context)
+
+
+@login_required
+def add_employee(request):
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not a corporate admin.")
+
+    # Check credits
+    if corporate.employees.count() >= corporate.employee_credits:
+        messages.error(request, "You have reached your employee limit.")
+        return redirect('manage_employees')
+
+    if request.method == "POST":
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        # Basic checks
+        if not username or not email:
+            messages.error(request, "Please fill in all fields.")
+            return redirect('add_employee')
+
+        # Create the user (no password set yet, or set a default)
+        user = User.objects.create_user(username=username, email=email)
+        # Optionally set a default password or send an invite email
+        # user.set_password("some-default-password")
+        # user.save()
+
+        # Link user to Employee model
+        Employee.objects.create(user=user, corporate=corporate)
+        messages.success(request, "Employee added successfully!")
+        return redirect('manage_employees')
+
+    return render(request, 'corporate/add_employee.html')
+
+
+#for corporate admins to manage plantations list
+@login_required
+def manage_plantations(request):
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not a corporate admin.")
+
+    # List ONLY the plantations that belong to this corporate
+    plantations = Plantation.objects.filter(corporate=corporate).select_related('owner')
+
+    context = {
+        'corporate': corporate,
+        'plantations': plantations
+    }
+    return render(request, 'corporate/manage_plantations.html', context)
+
+@login_required
+def assign_plantation(request, plantation_id):
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not a corporate admin.")
+
+    plantation = get_object_or_404(Plantation, id=plantation_id, corporate=corporate)
+    # Make sure this plantation actually belongs to the corporate admin
+
+    if request.method == "POST":
+        employee_id = request.POST.get('employee_id')
+        if employee_id:
+            employee = get_object_or_404(Employee, id=employee_id, corporate=corporate)
+            # Update the plantation owner
+            plantation.owner = employee.user
+            plantation.save()
+        return redirect('manage_plantations')
+
+    # GET request: show a form with a dropdown of employees
+    employees = corporate.employees.select_related('user')
+    context = {
+        'plantation': plantation,
+        'employees': employees
+    }
+    return render(request, 'corporate/assign_plantation.html', context)
