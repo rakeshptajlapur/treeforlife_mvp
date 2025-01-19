@@ -1,5 +1,8 @@
 asgiref==3.8.1
+diff-match-patch==20241021
 Django==5.1.5
+django-import-export==4.3.4
 pillow==11.1.0
 sqlparse==0.5.3
+tablib==3.7.0
 tzdata==2024.2
