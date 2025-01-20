@@ -30,7 +30,12 @@ path('', views.homepage, name='homepage'),
     path('corporate/employees/export/', views.export_employees, name='export_employees'),
     path('corporate/employees/import/', views.import_employees, name='import_employees'),
     
+    path('corporate/plantations/export/', views.export_plantations, name='export_plantations'),
+    path('corporate/plantations/import/', views.import_plantations, name='import_plantations'),
+    path('corporate/plantations/template/', views.download_import_template, name='download_import_template'),
+
     #---delete employee in manage employee table route---
     path('corporate/employees/delete/<int:employee_id>/', views.delete_employee, name='delete_employee'),
+   
 
 ]

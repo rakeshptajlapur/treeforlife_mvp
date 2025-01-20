@@ -12,6 +12,138 @@ import csv
 from django.http import HttpResponse
 
 
+@login_required
+def download_import_template(request):
+    # Check if the user is a corporate admin
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to access this page.")
+
+    # Create the CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="import_template.csv"'
+
+    writer = csv.writer(response)
+    # Write header row
+    writer.writerow(['Plantation Name', 'User Email'])
+
+    # Fetch plantations related to the corporate account
+    plantations = Plantation.objects.filter(corporate=corporate).select_related('owner')
+
+    # Write plantation data
+    for plantation in plantations:
+        writer.writerow([
+            plantation.name,
+            plantation.owner.email if plantation.owner else ''
+        ])
+
+    return response
+
+
+@login_required
+def export_plantations(request):
+    # Check if the user is a corporate admin
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to access this page.")
+
+    # Create the CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="plantations.csv"'
+
+    writer = csv.writer(response)
+    # Write header row
+    writer.writerow(['Plantation Name', 'Description', 'Date', 'Assigned User', 'User Email'])
+
+    # Fetch plantations related to the corporate account
+    plantations = Plantation.objects.filter(corporate=corporate).select_related('owner')
+
+    for plantation in plantations:
+        writer.writerow([
+            plantation.name,
+            plantation.description,
+            plantation.plantation_date,
+            plantation.owner.username if plantation.owner else 'Unassigned',
+            plantation.owner.email if plantation.owner else 'Unassigned',
+        ])
+
+    return response
+
+import csv
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import redirect
+from .models import Plantation, Corporate, Employee
+
+@login_required
+def import_plantations(request):
+    # Check if the user is a corporate admin
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not authorized to access this page.")
+
+    if request.method == "POST":
+        csv_file = request.FILES.get('csv_file')
+        if not csv_file or not csv_file.name.endswith('.csv'):
+            messages.error(request, "Invalid file format. Please upload a CSV file.")
+            return redirect('manage_plantations')
+
+        # Read CSV file
+        data = csv.reader(csv_file.read().decode('utf-8').splitlines())
+        next(data, None)  # Skip header row
+
+        plantation_count = corporate.plantations.count()
+        user_count = corporate.employees.count()
+        new_user_count = 0
+        rows_processed = 0
+        errors = []
+
+        for row in data:
+            rows_processed += 1
+            try:
+                plantation_name, user_email = row
+
+                # Validate plantation
+                plantation = Plantation.objects.filter(name=plantation_name, corporate=corporate).first()
+                if not plantation:
+                    errors.append(f"Row {rows_processed}: Plantation '{plantation_name}' does not exist.")
+                    continue
+
+                # Prevent editing plantation details
+                if plantation.description != plantation.description:
+                    errors.append(f"Row {rows_processed}: Editing plantation details is not allowed.")
+                    continue
+
+                # Validate user
+                user = User.objects.filter(email=user_email).first()
+                if not user:
+                    if user_count + new_user_count >= corporate.employee_credits:
+                        errors.append(f"Row {rows_processed}: User limit exceeded. Cannot add new user '{user_email}'.")
+                        continue
+                    # Create new user
+                    user = User.objects.create_user(username=user_email.split('@')[0], email=user_email)
+                    Employee.objects.create(user=user, corporate=corporate)
+                    new_user_count += 1
+
+                # Assign plantation
+                plantation.owner = user
+                plantation.save()
+            except ValueError:
+                errors.append(f"Row {rows_processed}: Invalid data format.")
+                continue
+
+        # Feedback
+        if errors:
+            messages.error(request, f"Some rows could not be processed:\n{', '.join(errors)}")
+        messages.success(request, f"{rows_processed - len(errors)} rows processed successfully.")
+
+        return redirect('manage_plantations')
+
+    return HttpResponseForbidden("Invalid request method.")
+
 
 @login_required
 def delete_employee(request, employee_id):

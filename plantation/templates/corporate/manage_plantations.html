@@ -64,8 +64,26 @@
       <p>Plantation Credits: {{ corporate.plantation_credits }}</p>
       <p>Plantations Used: {{ plantations.count }}</p>
 
+      <!-- Import/Export Buttons -->
+        <div class="d-flex justify-content-between mt-4">
+          <!-- Export Button -->
+          <a href="{% url 'export_plantations' %}" class="btn btn-success">
+            <i class="bi bi-download"></i> Download | Export Plantations
+          </a>
+
+          <!-- Download Template Link -->
+          <a href="{% url 'download_import_template' %}" class="btn btn-outline-info">
+            <i class="bi bi-file-earmark-arrow-down"></i> Download Import Template
+          </a>
+
+          <!-- Import Button with Modal Trigger -->
+          <button id="import-plantations-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="bi bi-upload"></i> Upload | Import Plantations
+          </button>
+        </div>
+
       <!-- Scrollable Table Container -->
-      <div style="max-height: 400px; overflow-y: auto;">
+      <div style="max-height: 400px; overflow-y: auto; margin-top: 20px;">
         <table class="table table-hover table-bordered" style="background-color: #fff; margin-top: 20px;">
           <thead class="table-dark">
             <tr>
@@ -95,6 +113,28 @@
             {% endfor %}
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Import -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="importModalLabel">Import Plantations</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="import-plantations-form" method="POST" enctype="multipart/form-data" action="{% url 'import_plantations' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="csvFile" class="form-label">Upload CSV File</label>
+            <input class="form-control" type="file" id="csvFile" name="csv_file" accept=".csv" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
       </div>
     </div>
   </div>
