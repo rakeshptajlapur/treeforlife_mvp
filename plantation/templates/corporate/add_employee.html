@@ -4,11 +4,6 @@
 {% block title %}Add Employee{% endblock %}
 
 {% block content %}
-<!-- 
-  Inline styles to override old .row/.col-md-3/.col-md-5 
-  Use "style" attributes so it doesn't break with your older CSS.
--->
-
 <div style="margin: 0 auto; max-width: 1200px;">
   <!-- Dashboard Row -->
   <div class="row" style="display: flex; flex-wrap: nowrap; min-height:70vh ;">
@@ -20,7 +15,6 @@
            color: #fff; 
            min-height:  ; 
            padding: 30px;
-           
            border-radius: 30px;
          ">
       <!-- Title -->
@@ -71,6 +65,7 @@
         Add Employee
       </h2>
 
+      <!-- Add Employee Form -->
       <form method="POST" style="max-width: 500px;">
         {% csrf_token %}
         <div class="mb-3">

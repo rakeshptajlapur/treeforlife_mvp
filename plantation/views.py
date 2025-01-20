@@ -8,6 +8,90 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.contrib import messages
 from .models import Corporate, Employee, Plantation, Timeline, Comment
+import csv
+from django.http import HttpResponse
+
+
+
+@login_required
+def delete_employee(request, employee_id):
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not a corporate admin.")
+    
+    # Fetch the employee object
+    employee = get_object_or_404(Employee, id=employee_id, corporate=corporate)
+    
+    # Check if the employee is assigned to any plantations
+    if employee.user.plantation_set.exists():
+        messages.error(request, "Cannot delete employee: plantations are assigned.")
+        return redirect('manage_employees')
+    
+    # If not assigned, delete the employee
+    user = employee.user
+    employee.delete()  # Remove the employee record
+    user.delete()      # Remove the associated user record
+    messages.success(request, "Employee deleted successfully.")
+    return redirect('manage_employees')
+
+@login_required
+def export_employees(request):
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not a corporate admin.")
+    
+    # Create the CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="employees.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Username', 'Email'])  # Headers
+
+    # Write employee data
+    for emp in corporate.employees.select_related('user'):
+        writer.writerow([emp.user.username, emp.user.email])
+    
+    return response
+
+@login_required
+def import_employees(request):
+    try:
+        corporate = request.user.corporate_account
+    except Corporate.DoesNotExist:
+        return HttpResponseForbidden("You are not a corporate admin.")
+    
+    if request.method == "POST":
+        csv_file = request.FILES.get('csv_file')
+        if not csv_file or not csv_file.name.endswith('.csv'):
+            messages.error(request, "Invalid file format. Please upload a CSV file.")
+            return redirect('manage_employees')
+        
+        # Read CSV file
+        data = csv.reader(csv_file.read().decode('utf-8').splitlines())
+        next(data, None)  # Skip header row
+
+        added_count = 0
+        for row in data:
+            if corporate.employees.count() >= corporate.employee_credits:
+                messages.warning(request, "Employee limit reached. Some rows were skipped.")
+                break
+            
+            try:
+                username, email = row
+                if not User.objects.filter(email=email).exists():
+                    user = User.objects.create_user(username=username, email=email)
+                    Employee.objects.create(user=user, corporate=corporate)
+                    added_count += 1
+            except ValueError:
+                messages.error(request, "Invalid data format in file.")
+                continue
+        
+        messages.success(request, f"{added_count} employees added successfully.")
+        return redirect('manage_employees')
+
+    return HttpResponseForbidden("Invalid request method.")
 
 def homepage(request):
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
@@ -273,3 +357,6 @@ def assign_plantation(request, plantation_id):
         'employees': employees
     }
     return render(request, 'corporate/assign_plantation.html', context)
+
+
+

@@ -26,5 +26,11 @@ path('', views.homepage, name='homepage'),
     path('corporate/plantation/<int:plantation_id>/assign/', views.assign_plantation, name='assign_plantation'),
     # ... etc
 
+    # ---- BUlk IMP EXP Routes ----
+    path('corporate/employees/export/', views.export_employees, name='export_employees'),
+    path('corporate/employees/import/', views.import_employees, name='import_employees'),
+    
+    #---delete employee in manage employee table route---
+    path('corporate/employees/delete/<int:employee_id>/', views.delete_employee, name='delete_employee'),
 
 ]

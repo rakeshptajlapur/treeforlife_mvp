@@ -4,7 +4,7 @@
 {% block title %}Manage Employees{% endblock %}
 
 {% block content %}
-<div style="margin: 0 auto; max-width: 1200px;">
+<div style="margin: 0 auto; max-width: 1200px; overflow-x: hidden;"> <!-- Prevent horizontal scrolling -->
   <div class="row" style="display: flex; flex-wrap: nowrap; min-height: 70vh;">
 
     <!-- Sidebar -->
@@ -14,6 +14,7 @@
            color: #fff; 
            padding: 30px;
            border-radius: 30px;
+           overflow: hidden; /* Prevents side scrolling in sidebar */
          ">
       <h5 style="margin-bottom: 30px;">
         <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>
@@ -54,6 +55,7 @@
            padding: 50px; 
            background-color: #e1eefa; 
            border-radius: 20px;
+           overflow-x: hidden; /* Prevents horizontal overflow */
          ">
 
       <h2 class="mb-4">
@@ -64,13 +66,27 @@
       <p>Employee Credits: {{ corporate.employee_credits }}</p>
       <p>Current count: {{ employees.count }}</p>
 
+      <!-- Import/Export Buttons -->
+      <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'export_employees' %}" class="btn btn-success">
+          <i class="bi bi-download"></i> Download | Export Employees
+        </a>
+        
+        <!-- Import Button with Modal Trigger -->
+        <button id="import-employees-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">
+          <i class="bi bi-upload"></i> Upload | Import Employees
+        </button>
+      </div>
+
       <!-- Scrollable Table Container -->
-      <div style="max-height: 400px; overflow-y: auto;">
-        <table class="table table-hover table-bordered" style="background-color: #fff; margin-top: 20px;">
+      <div style="max-height: 400px; overflow-y: auto; margin-top: 20px;">
+        <table class="table table-hover table-bordered" style="background-color: #fff; width: 100%;">
           <thead class="table-dark">
             <tr>
               <th>Username</th>
               <th>Email</th>
+              <th>Plantation Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -78,16 +94,52 @@
               <tr>
                 <td>{{ emp.user.username }}</td>
                 <td>{{ emp.user.email }}</td>
+                <td>
+                  {% if emp.user.plantation_set.count > 0 %}
+                    <a href="{% url 'owner_details' emp.user.username %}">
+                      Yes ({{ emp.user.plantation_set.count }})
+                    </a>
+                  {% else %}
+                    No
+                  {% endif %}
+                </td>
+                <td>
+                  {% if emp.user.plantation_set.count == 0 %}
+                    <a href="{% url 'delete_employee' emp.id %}" class="text-danger" title="Delete Employee">
+                      <i class="bi bi-x-circle"></i>
+                    </a>
+                  {% else %}
+                    <span class="text-secondary" title="Cannot delete: plantations assigned">
+                      <i class="bi bi-x-circle-fill"></i>
+                    </span>
+                  {% endif %}
+                </td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+</div>
 
-      <div class="mt-3">
-        <a href="{% url 'add_employee' %}" class="btn btn-primary">
-          <i class="bi bi-plus-circle"></i> Add Employee
-        </a>
+<!-- Modal for Import -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="importModalLabel">Import Employees</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="import-employees-form" method="POST" enctype="multipart/form-data" action="{% url 'import_employees' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="csvFile" class="form-label">Upload CSV File</label>
+            <input class="form-control" type="file" id="csvFile" name="csv_file" accept=".csv" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
       </div>
     </div>
   </div>
