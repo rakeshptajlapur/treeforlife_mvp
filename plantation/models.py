@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+
 
 class Corporate(models.Model):
     """
@@ -14,6 +16,7 @@ class Corporate(models.Model):
     def __str__(self):
         return self.name
 
+
 class Employee(models.Model):
     """
     Represents an employee user belonging to a specific Corporate.
@@ -23,6 +26,7 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ({self.corporate.name})"
+
 
 class Plantation(models.Model):
     name = models.CharField(max_length=255)
@@ -42,6 +46,22 @@ class Plantation(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        """
+        Custom validation to enforce plantation credits.
+        """
+        if self.corporate:
+            plantation_count = self.corporate.plantations.exclude(id=self.id).count()
+            if plantation_count >= self.corporate.plantation_credits:
+                raise ValidationError(
+                    f"Cannot add plantation '{self.name}'. Plantation limit exceeded for corporate account '{self.corporate.name}'."
+                )
+
+    def save(self, *args, **kwargs):
+        # Call clean to enforce validation
+        self.clean()
+        super().save(*args, **kwargs)
 
 
 class Timeline(models.Model):
