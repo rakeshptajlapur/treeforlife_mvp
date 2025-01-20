@@ -4,17 +4,18 @@
 {% block title %}Manage Employees{% endblock %}
 
 {% block content %}
-<div style="margin: 0 auto; max-width: 1200px; overflow-x: hidden;"> <!-- Prevent horizontal scrolling -->
+<div class="container-fluid" style="overflow-x: hidden;"> <!-- Use container-fluid for full-width layout -->
   <div class="row" style="display: flex; flex-wrap: nowrap; min-height: 70vh;">
 
     <!-- Sidebar -->
-    <div class="col-md-3" 
+    <div class="col-md-3"
          style="
-           background-color: #343a40; 
-           color: #fff; 
+           background-color: #343a40;
+           color: #fff;
            padding: 30px;
            border-radius: 30px;
-           overflow: hidden; /* Prevents side scrolling in sidebar */
+           flex-basis: 25%; /* Ensures consistent width */
+           overflow: hidden; /* Prevents side scrolling in the sidebar */
          ">
       <h5 style="margin-bottom: 30px;">
         <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>
@@ -23,7 +24,7 @@
 
       <ul class="nav flex-column" style="gap: 10px;">
         <li class="nav-item">
-          <a class="nav-link text-white" 
+          <a class="nav-link text-white"
              href="{% url 'corporate_dashboard' %}"
              style="padding-left: 0;">
             <i class="bi bi-house-door" style="margin-right: 5px;"></i>
@@ -31,7 +32,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" 
+          <a class="nav-link text-white"
              href="{% url 'manage_employees' %}"
              style="padding-left: 0;">
             <i class="bi bi-people" style="margin-right: 5px;"></i>
@@ -39,7 +40,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" 
+          <a class="nav-link text-white"
              href="{% url 'manage_plantations' %}"
              style="padding-left: 0;">
             <i class="bi bi-tree-fill" style="margin-right: 5px;"></i>
@@ -50,14 +51,14 @@
     </div>
 
     <!-- Main Content -->
-    <div class="col-md-9" 
+    <div class="col-md-9"
          style="
-           padding: 50px; 
-           background-color: #e1eefa; 
+           padding: 50px;
+           background-color: #e1eefa;
            border-radius: 20px;
-           overflow-x: hidden; /* Prevents horizontal overflow */
+           overflow-x: hidden;
+           flex-basis: 75%; /* Adjust width dynamically */
          ">
-
       <h2 class="mb-4">
         <i class="bi bi-people" style="margin-right: 8px;"></i>
         {{ corporate.name }} - Employees
@@ -66,16 +67,23 @@
       <p>Employee Credits: {{ corporate.employee_credits }}</p>
       <p>Current count: {{ employees.count }}</p>
 
-      <!-- Import/Export Buttons -->
+      <!-- Import/Export and Add Employee Buttons -->
       <div class="d-flex justify-content-between mt-4">
-        <a href="{% url 'export_employees' %}" class="btn btn-success">
-          <i class="bi bi-download"></i> Download | Export Employees
+        <div>
+          <a href="{% url 'export_employees' %}" class="btn btn-success">
+            <i class="bi bi-download"></i> Download | Export Employees
+          </a>
+          
+          <!-- Import Button with Modal Trigger -->
+          <button id="import-employees-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="bi bi-upload"></i> Upload | Import Employees
+          </button>
+        </div>
+
+        <!-- Add Employee Button -->
+        <a href="{% url 'add_employee' %}" class="btn btn-primary">
+          <i class="bi bi-plus-circle"></i> Add Employee
         </a>
-        
-        <!-- Import Button with Modal Trigger -->
-        <button id="import-employees-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">
-          <i class="bi bi-upload"></i> Upload | Import Employees
-        </button>
       </div>
 
       <!-- Scrollable Table Container -->
