@@ -36,7 +36,7 @@ def book_visit(request, plantation_id):
     """Handles visit booking form submission."""
     plantation = get_object_or_404(Plantation, id=plantation_id)
     plantation_url = request.build_absolute_uri()
-    form = VisitRequestForm()  # ✅ Always initialize the form
+    form = VisitRequestForm()
 
     if request.user != plantation.owner:
         messages.error(request, "❌ You are not authorized to book a visit for this plantation.")
@@ -59,25 +59,45 @@ def book_visit(request, plantation_id):
                 visit_request.status = "Pending"
                 visit_request.save()
 
-                # ✅ Send email notifications
-                try:
-                    send_email_async(
-                        subject=f"🌱 New Plantation Visit Request from {request.user.username}",
-                        message=f"""A new visit request has been submitted.
+                # ✅ Email notification to **site admin**
+                admin_subject = f"🌱 New Visit Request for {plantation.name}"
+                admin_message = f"""
+A new visit request has been submitted.
 
-                            🌱 Plantation: {plantation.name}
-                            👤 Owner: {request.user.username} ({request.user.email})
-                            📞 Phone: {form.cleaned_data['phone_number']}
-                            📅 Check-in: {form.cleaned_data['check_in_date']}
-                            📆 Check-out: {form.cleaned_data['check_out_date']}
-                            👥 Visitors: {form.cleaned_data['visitors']}
-                            ✉️ Message: {form.cleaned_data['message']}
-                            🔗 Plantation URL: {plantation_url}
-                        """,
-                        recipient_list=[settings.ADMIN_EMAIL]
-                    )
-                except Exception as email_error:
-                    messages.error(request, f"⚠️ Email sending failed: {email_error}")
+🌱 **Plantation**: {plantation.name}
+👤 **Visitor**: {request.user.username} ({request.user.email})
+📞 **Phone**: {form.cleaned_data['phone_number']}
+📅 **Check-in Date**: {form.cleaned_data['check_in_date']}
+📆 **Check-out Date**: {form.cleaned_data['check_out_date']}
+👥 **Number of Visitors**: {form.cleaned_data['visitors']}
+✉️ **Message from Visitor**: {form.cleaned_data['message']}
+
+🔗 View Plantation: {plantation_url}
+                """
+
+                try:
+                    send_email_async(admin_subject, admin_message, [settings.ADMIN_EMAIL])
+                except Exception as admin_email_error:
+                    messages.error(request, f"⚠️ Failed to notify admin: {admin_email_error}")
+
+                # ✅ Thank-you email to **plantation owner**
+                if plantation.owner.email:
+                    owner_subject = "🌱 Thank You for Your Visit Request"
+                    owner_message = f"""
+Dear {plantation.owner.username},
+
+Thank you for submitting your visit request for **{plantation.name}**.  
+Our team will review your request and get in touch with you shortly.
+
+For any queries, feel free to reach out.
+
+Best Regards,  
+TreeForLife Team
+                    """
+                    try:
+                        send_email_async(owner_subject, owner_message, [plantation.owner.email])
+                    except Exception as owner_email_error:
+                        messages.error(request, f"⚠️ Failed to send thank-you email: {owner_email_error}")
 
                 messages.success(request, "✅ Your visit request has been submitted successfully!")
 
