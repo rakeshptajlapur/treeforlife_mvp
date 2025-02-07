@@ -67,6 +67,52 @@
                         {% endfor %}
                     </tbody>
                 </table>
+
+
+
+
+
+                <h3>My Visit Requests</h3>
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Plantation</th>
+                                <th>Check-in</th>
+                                <th>Check-out</th>
+                                <th>Visitors</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in visit_requests %}
+                                <tr>
+                                    <td>{{ request.plantation.name }}</td>
+                                    <td>{{ request.check_in_date }}</td>
+                                    <td>{{ request.check_out_date }}</td>
+                                    <td>{{ request.visitors }}</td>
+                                    <td>
+                                        {% if request.status == "Pending" %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif request.status == "Approved" %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No visit requests found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+
+
+
+
+
             </div>
         </div>
     </div>

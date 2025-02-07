@@ -67,6 +67,7 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(VisitRequest)
 class VisitRequestAdmin(admin.ModelAdmin):
-    list_display = ('owner', 'plantation', 'check_in_date', 'check_out_date', 'visitors', 'created_at')
+    list_display = ('owner', 'plantation', 'check_in_date', 'check_out_date', 'visitors', 'status', 'created_at')
+    list_filter = ('status', 'check_in_date')
     search_fields = ('owner__username', 'plantation__name', 'phone_number')
-    list_filter = ('check_in_date', 'check_out_date')
+    list_editable = ('status',)  # ✅ Allow quick approval/rejection in admin

@@ -87,7 +87,12 @@ class Comment(models.Model):
 
 
 class VisitRequest(models.Model):
-    """Stores visit requests made by plantation owners."""
+    STATUS_CHOICES = [
+        ("Pending", "Pending"),
+        ("Approved", "Approved"),
+        ("Rejected", "Rejected"),
+    ]
+    
     plantation = models.ForeignKey('Plantation', on_delete=models.CASCADE, related_name="visit_requests")
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15)
@@ -96,6 +101,7 @@ class VisitRequest(models.Model):
     visitors = models.PositiveIntegerField()
     message = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="Pending")  # ✅ Status Field
 
     def __str__(self):
-        return f"Visit Request by {self.owner.username} for {self.plantation.name}"
+        return f"Visit Request by {self.owner.username} for {self.plantation.name} ({self.status})"

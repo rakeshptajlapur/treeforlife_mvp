@@ -5,44 +5,38 @@
 
 {% block content %}
 
-{% if form.errors %}
-    <div class="alert alert-danger">
-        <strong>Please fix the errors below:</strong>
-        <ul>
-            {% for field, errors in form.errors.items %}
-                {% for error in errors %}
-                    <li>{{ field|title }}: {{ error }}</li>
-                {% endfor %}
-            {% endfor %}
-        </ul>
+<!-- ✅ Bootstrap Modal for Success/Error Messages -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <span id="statusMessage"></span>
+            </div>
+            <div class="modal-footer">
+                <a href="{% url 'plantation_details' plantation.id %}" class="btn btn-primary">🌿 View Plantation</a>
+                <a href="{% url 'owner_details' user.username %}" class="btn btn-secondary">👤 My Profile</a>
+            </div>
+        </div>
     </div>
-{% endif %}
-
+</div>
 
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <!-- Success Message -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <div class="card shadow" style="max-width: 1000px; margin: auto;">
+            <div class="card shadow" style="max-width: 1000px; margin: auto; background-color: rgb(231, 242, 255);">
                 <div class="card-header text-center bg-primary text-white">
                     <h4><i class="bi bi-calendar-plus"></i> Book a Plantation Visit</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST">
+                    <form method="POST" id="visitForm">
                         {% csrf_token %}
-
                         <div class="row">
                             <!-- Column 1 (Prefilled Fields) -->
-                            <div class="col-md-6" style="max-width:450px;">
+                            <div class="col-md-3">
                                 <div class="mb-3">
                                     <label class="form-label">Owner Name</label>
                                     <input type="text" class="form-control" value="{{ user.username }}" disabled>
@@ -57,38 +51,38 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Plantation URL</label>
-                                    <input type="text" class="form-control" value="{{ request.build_absolute_uri }}" disabled>
+                                    <input type="text" class="form-control" value="{{ plantation_url }}" disabled>
                                 </div>
                             </div>
 
                             <!-- Column 2 (User Input Fields) -->
-                            <div class="col-md-6" style="max-width: 450px;">
+                            <div class="col-md-7">
                                 <div class="mb-3">
                                     <label class="form-label">Phone Number</label>
-                                    <input type="text" name="phone_number" class="form-control" required>
+                                    {{ form.phone_number }}
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Check-in Date & Time</label>
-                                    <input type="datetime-local" name="check_in_date" class="form-control" required>
+                                    {{ form.check_in_date }}
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Check-out Date & Time</label>
-                                    <input type="datetime-local" name="check_out_date" class="form-control" required>
+                                    {{ form.check_out_date }}
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">No. of Visitors</label>
-                                    <input type="number" name="visitors" class="form-control" min="1" required>
+                                    {{ form.visitors }}
                                 </div>
-                                
                             </div>
                         </div>
-                        <div class="mb-3">
+
+                        <div class="mb-3" style="padding: 30px;">
                             <label class="form-label">Message</label>
-                            <textarea name="message" class="form-control" rows="3" placeholder="Any special request?"></textarea>
+                            {{ form.message }}
                         </div>
 
                         <div class="text-center">
-                            <button type="submit" class="btn btn-success px-5">
+                            <button type="submit" class="btn btn-success px-5" id="submitBtn">
                                 <i class="bi bi-send"></i> Submit Request
                             </button>
                         </div>
@@ -104,4 +98,29 @@
         </div>
     </div>
 </div>
+
+<!-- ✅ Handle Success/Error Messages in Modal -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        {% if messages %}
+            let messageType = "success"; // Default success
+            let modalTitle = "✅ Success";
+            let messageContent = "";
+
+            {% for message in messages %}
+                {% if 'error' in message.tags %}
+                    messageType = "danger"; // Override for error
+                    modalTitle = "❌ Error";
+                {% endif %}
+                messageContent += "{{ message }}<br>";
+            {% endfor %}
+
+            document.getElementById("statusModalLabel").innerHTML = modalTitle;
+            document.getElementById("statusMessage").innerHTML = messageContent;
+            let modal = new bootstrap.Modal(document.getElementById('statusModal'));
+            modal.show();
+        {% endif %}
+    });
+</script>
+
 {% endblock %}

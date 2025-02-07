@@ -35,16 +35,43 @@
       </div>
       <hr>
 
-          <!-- Book Appointment Button (Only for the Owner) -->
-          {% if user.is_authenticated and user == plantation.owner %}
-          <a href="{% url 'book_visit' plantation.id %}" class="btn btn-outline-primary w-100 mt-3">
+  {% if user.is_authenticated and user == plantation.owner %}
+      {% if pending_request %}
+          <!-- If pending request exists, show modal trigger button -->
+          <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#pendingRequestModal">
+              <i class="bi bi-exclamation-circle"></i> Visit Request Pending
+          </button>
+  
+          <!-- Modal -->
+          <div class="modal fade" id="pendingRequestModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+              <div class="modal-dialog">
+                  <div class="modal-content">
+                      <div class="modal-header" style="color: black;">
+                          <h5 class="modal-title" id="modalTitle">🚨 Visit Request Pending</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body" style="color: black;">
+                          You already have a **pending visit request** for this plantation.  
+                          Please wait for approval from our team before booking another appointment.
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK, Got It</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      {% else %}
+          <!-- Normal Book Appointment Button -->
+          <a href="{% url 'book_visit' plantation.id %}" class="btn btn-outline-primary btn-sm">
               <i class="bi bi-calendar-plus"></i> Book Appointment
-            </a>
-          {% else %}
-            <button class="btn btn-secondary w-100 mt-3" disabled>
-              <i class="bi bi-calendar-x"></i> Book Appointment (Owner Only)
-            </button>
-          {% endif %}
+          </a>
+      {% endif %}
+  {% else %}
+      <button class="btn btn-secondary btn-sm" disabled>
+          <i class="bi bi-calendar-x"></i> Book Appointment (Owner Only)
+      </button>
+  {% endif %}
+  
 <hr>
 
 

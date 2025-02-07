@@ -17,7 +17,9 @@ from django.conf import settings
 from threading import Thread
 from django.core.mail import send_mail, BadHeaderError
 from django.db import DatabaseError
-
+from django.urls import reverse
+from django.http import JsonResponse
+import time
 
 def send_email_async(subject, message, recipient_list):
     """Send email in a separate thread to avoid blocking the request."""
@@ -29,66 +31,55 @@ def send_email_async(subject, message, recipient_list):
 
 
 
-
-
-
 @login_required
 def book_visit(request, plantation_id):
-    """Handles the visit booking form submission."""
+    """Handles visit booking form submission."""
     plantation = get_object_or_404(Plantation, id=plantation_id)
+    plantation_url = request.build_absolute_uri()
+    form = VisitRequestForm()  # ✅ Always initialize the form
 
     if request.user != plantation.owner:
         messages.error(request, "❌ You are not authorized to book a visit for this plantation.")
-        return redirect('plantation_details', id=plantation.id)  # ✅ Fix incorrect plantation_id
+        return render(request, 'plantation/book_visit.html', {'form': form, 'plantation': plantation, 'plantation_url': plantation_url})
+
+    # ✅ Check if a pending visit request already exists
+    if VisitRequest.objects.filter(plantation=plantation, owner=request.user, status="Pending").exists():
+        messages.error(request, "🚨 You already have a pending visit request for this plantation!")
+        return render(request, 'plantation/book_visit.html', {'form': form, 'plantation': plantation, 'plantation_url': plantation_url})
 
     if request.method == "POST":
         form = VisitRequestForm(request.POST)
         if form.is_valid():
             print("✅ Form is valid, saving data...")
             try:
-                # ✅ Save visit request in DB
+                # ✅ Save visit request
                 visit_request = form.save(commit=False)
                 visit_request.plantation = plantation
                 visit_request.owner = request.user
+                visit_request.status = "Pending"
                 visit_request.save()
 
-                # ✅ Send async email to admin
-                admin_email = settings.ADMIN_EMAIL  
-                send_email_async(
-                    subject=f"🌱 New Plantation Visit Request from {request.user.username}",
-                    message=f"""
-                        A new visit request has been submitted.
+                # ✅ Send email notifications
+                try:
+                    send_email_async(
+                        subject=f"🌱 New Plantation Visit Request from {request.user.username}",
+                        message=f"""A new visit request has been submitted.
 
-                        🌱 Plantation: {plantation.name}
-                        👤 Owner: {request.user.username} ({request.user.email})
-                        📞 Phone: {form.cleaned_data['phone_number']}
-                        📅 Check-in: {form.cleaned_data['check_in_date']}
-                        📆 Check-out: {form.cleaned_data['check_out_date']}
-                        👥 Visitors: {form.cleaned_data['visitors']}
-                        ✉️ Message: {form.cleaned_data['message']}
-                        
-                        Please review the request in the admin panel.
-                    """,
-                    recipient_list=[admin_email]
-                )
-
-                # ✅ Send async confirmation email to owner
-                send_email_async(
-                    subject="✅ Your Plantation Visit Request Has Been Received",
-                    message=f"""
-                        Dear {request.user.username},
-
-                        Your request to visit plantation "{plantation.name}" has been received.
-                        Our team will review your request and contact you accordingly.
-
-                        Thank you,
-                        🌿 TreeForLife Team
-                    """,
-                    recipient_list=[request.user.email]
-                )
+                            🌱 Plantation: {plantation.name}
+                            👤 Owner: {request.user.username} ({request.user.email})
+                            📞 Phone: {form.cleaned_data['phone_number']}
+                            📅 Check-in: {form.cleaned_data['check_in_date']}
+                            📆 Check-out: {form.cleaned_data['check_out_date']}
+                            👥 Visitors: {form.cleaned_data['visitors']}
+                            ✉️ Message: {form.cleaned_data['message']}
+                            🔗 Plantation URL: {plantation_url}
+                        """,
+                        recipient_list=[settings.ADMIN_EMAIL]
+                    )
+                except Exception as email_error:
+                    messages.error(request, f"⚠️ Email sending failed: {email_error}")
 
                 messages.success(request, "✅ Your visit request has been submitted successfully!")
-                return redirect('plantation_details', id=plantation.id)  # ✅ Fixed redirect issue
 
             except DatabaseError:
                 messages.error(request, "❌ Database error: Unable to save visit request. Please try again.")
@@ -96,20 +87,9 @@ def book_visit(request, plantation_id):
                 messages.error(request, f"❌ Unexpected error: {db_error}")
 
         else:
-            print("⚠️ Form errors:", form.errors)
             messages.error(request, "⚠️ Please correct the errors in the form and try again.")
 
-    else:
-        # ✅ Prefill form with user & plantation data
-        form = VisitRequestForm(initial={
-            'plantation_name': plantation.name,
-            'plantation_url': request.build_absolute_uri(),
-            'owner_name': request.user.username,
-            'owner_email': request.user.email,
-        })
-
-    return render(request, 'plantation/book_visit.html', {'form': form, 'plantation': plantation})
-
+    return render(request, 'plantation/book_visit.html', {'form': form, 'plantation': plantation, 'plantation_url': plantation_url})
 
 
 
@@ -404,7 +384,13 @@ def logout_view(request):
 def owner_details(request, username):
     owner = get_object_or_404(User, username=username)
     plantations = Plantation.objects.filter(owner=owner)
+
+    # ✅ Get visit requests related to the owner
+    visit_requests = VisitRequest.objects.filter(owner=owner).order_by('-created_at')
+
+    # Hide email if the current user is not the owner
     email = owner.email if request.user.is_authenticated and request.user == owner else "Hidden"
+
     breadcrumbs = [
         {'name': 'Home', 'url': reverse('homepage')},
         {'name': f"Owner: {owner.username}", 'url': None}
@@ -414,7 +400,10 @@ def owner_details(request, username):
         'plantations': plantations,
         'email': email,
         'breadcrumbs': breadcrumbs,
+        'visit_requests': visit_requests,  # ✅ Pass visit requests to the template,
     })
+
+
 
 def plantation_details(request, id):
     plantation = get_object_or_404(Plantation, id=id)
@@ -423,11 +412,25 @@ def plantation_details(request, id):
         {'name': 'Home', 'url': reverse('homepage')},
         {'name': f"Plantation: {plantation.name}", 'url': None},
     ]
+
+    # ✅ Ensure pending_request is always a boolean
+    pending_request = False  # Default: No pending request
+
+    if request.user.is_authenticated and request.user == plantation.owner:
+        pending_request = VisitRequest.objects.filter(
+            plantation=plantation,
+            owner=request.user,
+            status="Pending"
+        ).exists()  # ✅ Always return True or False
+
     return render(request, "plantation/plantation_details.html", {
         'plantation': plantation,
         'timelines': timelines,
         'breadcrumbs': breadcrumbs,
+        'pending_request': pending_request,  # ✅ Pass boolean
     })
+
+
 
 @login_required
 def add_comment(request, plantation_id, timeline_id):
