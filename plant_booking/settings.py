@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -152,17 +154,19 @@ LOGIN_REDIRECT_URL = '/'  # Redirect to homepage after login
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+
 # Admin Email for Notifications
 ADMIN_EMAIL = "contact@treeforlife.net"
 
 # SMTP Email Settings (Make sure you replace with actual details)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.hostinger.com"
-EMAIL_PORT = 465  # SSL port
-EMAIL_USE_TLS = False  # ❌ Disable TLS
-EMAIL_USE_SSL = True  # ✅ Enable SSL
-EMAIL_HOST_USER = "contact@treeforlife.net"
-EMAIL_HOST_PASSWORD = "123iop99A!"  # Double-check this
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.hostinger.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 465))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "contact@treeforlife.net")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
 
