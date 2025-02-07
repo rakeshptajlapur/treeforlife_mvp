@@ -10,6 +10,107 @@ from django.contrib import messages
 from .models import Corporate, Employee, Plantation, Timeline, Comment
 import csv
 from django.http import HttpResponse
+from django.core.mail import send_mail
+from .forms import VisitRequestForm
+from .models import VisitRequest  
+from django.conf import settings
+from threading import Thread
+from django.core.mail import send_mail, BadHeaderError
+from django.db import DatabaseError
+
+
+def send_email_async(subject, message, recipient_list):
+    """Send email in a separate thread to avoid blocking the request."""
+    Thread(
+        target=send_mail,
+        args=(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list),
+        kwargs={"fail_silently": False}
+    ).start()
+
+
+
+
+
+
+@login_required
+def book_visit(request, plantation_id):
+    """Handles the visit booking form submission."""
+    plantation = get_object_or_404(Plantation, id=plantation_id)
+
+    if request.user != plantation.owner:
+        messages.error(request, "❌ You are not authorized to book a visit for this plantation.")
+        return redirect('plantation_details', id=plantation.id)  # ✅ Fix incorrect plantation_id
+
+    if request.method == "POST":
+        form = VisitRequestForm(request.POST)
+        if form.is_valid():
+            print("✅ Form is valid, saving data...")
+            try:
+                # ✅ Save visit request in DB
+                visit_request = form.save(commit=False)
+                visit_request.plantation = plantation
+                visit_request.owner = request.user
+                visit_request.save()
+
+                # ✅ Send async email to admin
+                admin_email = settings.ADMIN_EMAIL  
+                send_email_async(
+                    subject=f"🌱 New Plantation Visit Request from {request.user.username}",
+                    message=f"""
+                        A new visit request has been submitted.
+
+                        🌱 Plantation: {plantation.name}
+                        👤 Owner: {request.user.username} ({request.user.email})
+                        📞 Phone: {form.cleaned_data['phone_number']}
+                        📅 Check-in: {form.cleaned_data['check_in_date']}
+                        📆 Check-out: {form.cleaned_data['check_out_date']}
+                        👥 Visitors: {form.cleaned_data['visitors']}
+                        ✉️ Message: {form.cleaned_data['message']}
+                        
+                        Please review the request in the admin panel.
+                    """,
+                    recipient_list=[admin_email]
+                )
+
+                # ✅ Send async confirmation email to owner
+                send_email_async(
+                    subject="✅ Your Plantation Visit Request Has Been Received",
+                    message=f"""
+                        Dear {request.user.username},
+
+                        Your request to visit plantation "{plantation.name}" has been received.
+                        Our team will review your request and contact you accordingly.
+
+                        Thank you,
+                        🌿 TreeForLife Team
+                    """,
+                    recipient_list=[request.user.email]
+                )
+
+                messages.success(request, "✅ Your visit request has been submitted successfully!")
+                return redirect('plantation_details', id=plantation.id)  # ✅ Fixed redirect issue
+
+            except DatabaseError:
+                messages.error(request, "❌ Database error: Unable to save visit request. Please try again.")
+            except Exception as db_error:
+                messages.error(request, f"❌ Unexpected error: {db_error}")
+
+        else:
+            print("⚠️ Form errors:", form.errors)
+            messages.error(request, "⚠️ Please correct the errors in the form and try again.")
+
+    else:
+        # ✅ Prefill form with user & plantation data
+        form = VisitRequestForm(initial={
+            'plantation_name': plantation.name,
+            'plantation_url': request.build_absolute_uri(),
+            'owner_name': request.user.username,
+            'owner_email': request.user.email,
+        })
+
+    return render(request, 'plantation/book_visit.html', {'form': form, 'plantation': plantation})
+
+
 
 
 @login_required

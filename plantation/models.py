@@ -84,3 +84,18 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class VisitRequest(models.Model):
+    """Stores visit requests made by plantation owners."""
+    plantation = models.ForeignKey('Plantation', on_delete=models.CASCADE, related_name="visit_requests")
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15)
+    check_in_date = models.DateTimeField()
+    check_out_date = models.DateTimeField()
+    visitors = models.PositiveIntegerField()
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Visit Request by {self.owner.username} for {self.plantation.name}"

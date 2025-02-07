@@ -5,7 +5,9 @@ from import_export.admin import ImportExportMixin
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from .resources import UserResource, PlantationResource
-from .models import Corporate, Employee, Plantation, Timeline, Comment
+from .models import Corporate, Employee, Plantation, Timeline, Comment, VisitRequest
+
+
 
 # Unregister the default UserAdmin before defining your custom admin
 admin.site.unregister(User)
@@ -61,3 +63,10 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ('timeline', 'user', 'created_at', 'text')
     search_fields = ('text',)
     list_filter = ('timeline', 'user')
+
+
+@admin.register(VisitRequest)
+class VisitRequestAdmin(admin.ModelAdmin):
+    list_display = ('owner', 'plantation', 'check_in_date', 'check_out_date', 'visitors', 'created_at')
+    search_fields = ('owner__username', 'plantation__name', 'phone_number')
+    list_filter = ('check_in_date', 'check_out_date')

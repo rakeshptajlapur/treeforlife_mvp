@@ -2,6 +2,7 @@ from django.urls import path, include
 from django.contrib import admin
 from . import views
 from django.contrib.auth import views as auth_views
+from .views import book_visit
 
 
 urlpatterns = [
@@ -14,6 +15,7 @@ path('', views.homepage, name='homepage'),
     # existing stuff...
     path('owner-details/<str:username>/', views.owner_details, name='owner_details'),
     path('plantation-details/<int:id>/', views.plantation_details, name='plantation_details'),
+    
     path('plantation/<int:plantation_id>/timeline/<int:timeline_id>/', views.timeline_details, name='timeline_details'),
     path('plantation/<int:plantation_id>/timeline/<int:timeline_id>/add_comment/', views.add_comment, name='add_comment'),
     path('plantation/<int:plantation_id>/timeline/<int:timeline_id>/ajax/', views.timeline_details_ajax, name='timeline_details_ajax'),
@@ -39,6 +41,12 @@ path('', views.homepage, name='homepage'),
    
     #---certificates view--- 
     path('certificate/<int:plantation_id>/', views.view_certificate, name='view_certificate'),
+
+    #---visit request form---
+    path('plantation/<int:plantation_id>/visit/', views.book_visit, name='book_visit'),
+    
+
+    
 
 
 ]

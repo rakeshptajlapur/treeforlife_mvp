@@ -151,3 +151,18 @@ LOGIN_REDIRECT_URL = '/'  # Redirect to homepage after login
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Admin Email for Notifications
+ADMIN_EMAIL = "contact@treeforlife.net"
+
+# SMTP Email Settings (Make sure you replace with actual details)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.hostinger.com"
+EMAIL_PORT = 465  # SSL port
+EMAIL_USE_TLS = False  # ❌ Disable TLS
+EMAIL_USE_SSL = True  # ✅ Enable SSL
+EMAIL_HOST_USER = "contact@treeforlife.net"
+EMAIL_HOST_PASSWORD = "123iop99A!"  # Double-check this
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
