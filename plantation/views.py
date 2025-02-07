@@ -13,6 +13,30 @@ from django.http import HttpResponse
 
 
 @login_required
+def view_certificate(request, plantation_id):
+    plantation = get_object_or_404(Plantation, id=plantation_id)
+    
+    # Access control: Only the owner may view the certificate.
+    if plantation.owner != request.user:
+        messages.error(request, "You are not authorized to view this certificate.")
+        return redirect('plantation_details', id=plantation.id)  # or another appropriate view
+    
+    # Prepare the dynamic data for the certificate.
+    context = {
+        'owner_name': request.user.get_full_name() or request.user.username,
+        'plantation_name': plantation.name,
+        'plantation_date': plantation.plantation_date,
+        'issuance_date': plantation.plantation_date,  # Assuming both dates are the same
+        # Add any additional fields as needed.
+    }
+    
+    return render(request, 'plantation/certificate.html', context)
+
+
+
+
+
+@login_required
 def download_import_template(request):
     # Check if the user is a corporate admin
     try:

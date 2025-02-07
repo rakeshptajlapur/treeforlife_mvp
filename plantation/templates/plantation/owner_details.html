@@ -35,6 +35,7 @@
                             <th>SL</th>
                             <th>Plant Name</th>
                             <th>Plantation Date</th>
+                            <th>Certificate</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,10 +48,21 @@
                                     </a>
                                 </td>
                                 <td>{{ plantation.plantation_date|date:"F j, Y" }}</td>
+                                <td>
+                                    {% if user.is_authenticated and owner == user %}
+                                        <a href="{% url 'view_certificate' plantation.id %}" class="btn btn-info btn-sm " target="_blank">
+                                            View Certificate
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm" disabled>
+                                            View Certificate
+                                        </button>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center">No plantations available for this owner.</td>
+                                <td colspan="4" class="text-center">No plantations available for this owner.</td>
                             </tr>
                         {% endfor %}
                     </tbody>

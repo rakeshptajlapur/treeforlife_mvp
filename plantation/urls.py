@@ -37,5 +37,8 @@ path('', views.homepage, name='homepage'),
     #---delete employee in manage employee table route---
     path('corporate/employees/delete/<int:employee_id>/', views.delete_employee, name='delete_employee'),
    
+    #---certificates view--- 
+    path('certificate/<int:plantation_id>/', views.view_certificate, name='view_certificate'),
+
 
 ]

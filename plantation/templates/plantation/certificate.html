@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Certificate of Appreciation</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Georgia', serif;
+      background-color: #f7f7f7;
+      overflow-x: hidden;
+    }
+    /* Certificate container with fixed dimensions */
+    .certificate-container {
+      position: relative;
+      width: 800px;
+      height: 600px; /* Fixed height */
+      margin: 20px auto;
+      border: 5px solid #FFD700; /* Golden border for a royal touch */
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      overflow: hidden;
+      text-align: center;
+    }
+    /* Background image as an actual <img> element */
+    .certificate-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    /* Content overlay */
+    .certificate-content {
+      position: relative;
+      z-index: 1;
+      padding: 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    /* Top Header */
+    .header-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 40px;
+      color: green;
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+    /* Main Certificate Title */
+    .certificate-title {
+      font-size: 60px;
+      font-family: 'The Youngest Serif', serif;
+      font-weight: bold;
+      color: #65580a; /* Goldenish tone */
+      margin: 10px 0;
+    }
+    .sub-title {
+      font-size: 20px;
+      margin: 10px 0;
+    }
+    .owner-name {
+      font-size: 28px;
+      font-weight: bold;
+      text-decoration: underline;
+      margin: 10px 0;
+    }
+    .plantation-info {
+      font-size: 20px;
+      margin: 5px 0;
+      text-transform: uppercase;
+    }
+    .content-message {
+      font-size: 18px;
+      margin: 10px 40px;
+      line-height: 1.4;
+    }
+    /* Footer Section */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      padding: 0 20px 20px;
+      margin-bottom: 25px;
+    }
+    .logo-section img {
+      max-width: 80px;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .signature-section img {
+      max-width: 120px;
+      display: block;
+      margin-bottom: 5px;
+      border-bottom: 2px solid #000;
+    }
+    .signature-section .signer-name {
+      font-size: 16px;
+      margin-top: 5px;
+    }
+    /* Print adjustments to force colors */
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .print-button-container {
+        display: none !important;
+      }
+      .certificate-bg {
+        display: block;
+      }
+    }
+    /* Button container for Print/Download */
+    .print-button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .print-button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .print-button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="certificate-container">
+    <!-- Background Image -->
+    <img src="{% static 'css/images/certi_bg.png' %}" alt="Certificate Background" class="certificate-bg">
+    
+    <!-- Content Overlay -->
+    <div class="certificate-content">
+      <!-- Top Section -->
+      <div>
+        <div class="header-title">TREEFORLIFE.NET</div>
+        <div class="certificate-title">Certificate of Appreciation</div>
+        <div class="sub-title">Proudly Presented To</div>
+        <div class="owner-name">{{ owner_name }}</div>
+        <div class="plantation-info">
+          For owning the plantation <strong style="text-decoration: underline;">{{ plantation_name }}</strong>
+        </div>
+      </div>
+      
+      <!-- Middle Content Message -->
+      <div class="content-message" style="margin-top:-30px ;">
+        We thank you for your outstanding commitment and exemplary performance in contributing to our plantation management initiative and a better green world for all.
+      </div>
+      
+      <!-- Date Information -->
+      <div class="plantation-info">
+        <i>Plantation Date: {{ plantation_date }} | Issuance Date: {{ issuance_date }}</i>
+      </div>
+      
+      <!-- Footer Section -->
+      <div class="footer">
+        <div class="logo-section">
+          <img src="{% static 'css/images/treeforlifelogo.png' %}" alt="Site Logo">
+          <div>treeforlife.net</div>
+        </div>
+        <div class="signature-section">
+          <img src="{% static 'css/images/treeforlifelogo.png' %}" alt="Signature">
+          <div class="signer-name">Ankit Kadia, Founder</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Print/Download Button -->
+  <div class="print-button-container">
+    <button class="print-button" onclick="window.print()">Print / Download Certificate</button>
+  </div>
+</body>
+</html>
