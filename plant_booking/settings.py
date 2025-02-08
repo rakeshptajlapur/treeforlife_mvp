@@ -135,6 +135,8 @@ USE_TZ = True
 #STATIC_URL = 'static/'
 STATIC_URL = '/static/'  # URL to access static files
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Include your static files folder
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
 
 
 

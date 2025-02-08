@@ -1,0 +1,239 @@
+/* Ensure the html and body take up the full height of the viewport */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Use flexbox on the body to make the page take up full height */
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The main content container should take the available space */
+.container {
+  flex-grow: 1;  /* Takes the available space */
+  padding-top:0px ; /* Adjust this based on your needs */
+}
+
+/* Footer styles */
+footer {
+  background-color: #343a40; /* Footer background */
+  color: white;  /* Text color */
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 200px;  /* Push the footer to the bottom */
+}
+
+/* Basic Timeline Link Style */
+.timeline-link {
+  color: #007bff; /* Bootstrap blue */
+  text-decoration: none;
+  transition: color 0.3s, background-color 0.3s;
+}
+
+/* Hover Effect for Timeline Links */
+.timeline-link:hover {
+  color: #fff;
+  background-color: #007bff; /* Blue background on hover */
+  border-radius: 4px;
+  padding: 2px 5px;
+  text-decoration: none;
+}
+
+/* Active (Selected) Timeline Link */
+.timeline-link.active {
+  color: #fff !important ;  /* White text */
+  background-color: green !important;  /* Blue background */
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 8px;
+}
+
+/* Sidebar (Dark Background) */
+.col-md-3.sidebar {
+  background-color: #343a40; /* Sidebar background color */
+  padding: 20px;
+  border-radius: 8px;
+  color: #fff;
+}
+
+/* Links in Sidebar */
+.col-md-3.sidebar a {
+  color: #fff;
+}
+
+/* Hover effect for links in Sidebar */
+.col-md-3.sidebar a:hover {
+  text-decoration: underline;
+}
+
+/* Timeline Section (Vibrant Accent) */
+.col-md-3.timeline {
+  background-color: #8deeee; /* Light cyan background for timeline section */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Heading in Timeline Section */
+.col-md-3.timeline h3 {
+  color: #000;
+}
+
+/* Links in Timeline Section */
+.col-md-3.timeline a {
+  color: #007bff; /* Bootstrap blue */
+  text-decoration: none;
+}
+
+/* Hover effect for links in Timeline Section */
+.col-md-3.timeline a:hover {
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+
+/* Timeline Details Section (Light & Calm) */
+.col-md-5.timeline-details {
+  background-color: #fafad2; /* Light Goldenrod Yellow background */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Italicize the heading in the Timeline Details Section */
+.col-md-5.timeline-details h3 {
+  font-style: italic;
+}
+
+/* Links in Timeline Details Section */
+.col-md-5.timeline-details a {
+  color: #007bff;
+}
+
+/* Paragraph styling in Timeline Details Section */
+.col-md-5.timeline-details p {
+  font-size: 1.1em;
+}
+
+/* Mobile Responsiveness: Stack columns vertically on smaller screens */
+@media (max-width: 768px) {
+  .row {
+      flex-direction: column; /* Stack sections vertically on small screens */
+  }
+}
+
+/* Additional Spacing Between Sections */
+.container {
+  margin-top: 30px; /* Adds top margin to container for spacing */
+}
+
+.col-md-3, .col-md-5 {
+  margin-bottom: 20px; /* Margin to create space between sections */
+}
+
+/* Flexbox Layout for Centering and Spacing Sections */
+.row {
+  display: flex;
+  justify-content: space-around; /* Space out the sections evenly */
+  gap: 20px; /* Add some gap between sections */
+}
+
+/* Ensure content takes full height of the viewport */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Footer - Fix position at the bottom of the page */
+footer {
+  background-color: #343a40; /* Footer background */
+  color: white;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  margin-top: auto; /* Push footer to the bottom */
+}
+
+/* Styling for Timeline Links */
+.timeline-link {
+  color: #007bff;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Hover Effect for Timeline Links */
+.timeline-link:hover {
+  color: white;
+  background-color: #007bff;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* Active (Selected) Timeline Link */
+.timeline-link.active {
+  background-color: #dc3545; /* Red background for active link */
+  color: white; /* White text for readability */
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* Ensure the Timeline List, Sidebar, and Details Section are well-aligned */
+.container {
+  margin-top: 30px;
+}
+
+.col-md-3, .col-md-5 {
+  margin-bottom: 20px; /* Adds space between sections */
+}
+
+/* Flexbox for Spacing */
+.row {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px; /* Gap between sections */
+}
+
+/* For Centering Content Inside Each Column */
+.col-md-3, .col-md-5 {
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Specific Background for Sidebar */
+.col-md-3.sidebar {
+  background-color: #343a40; /* Dark background for sidebar */
+}
+
+/* Specific Background for Timeline Section */
+.col-md-3.timeline {
+  background-color: #8deeee; /* Light background for timeline list */
+}
+
+/* Specific Background for Timeline Details */
+.col-md-5.timeline-details {
+  background-color: #fafad2; /* Soft yellow background for details */
+}
+
+
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+  content: '>';
+  color: #6c757d;
+}
+.breadcrumb-item a {
+  text-decoration: none;
+  color: #007bff;
+}
+.breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+  
+
