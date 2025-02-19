@@ -45,6 +45,9 @@ path('', views.homepage, name='homepage'),
     #---visit request form---
     path('plantation/<int:plantation_id>/visit/', views.book_visit, name='book_visit'),
     
+    # Add this new URL pattern
+    path('mapview/', views.plantation_map_view, name='plantation_map'),
+    
 
     
 

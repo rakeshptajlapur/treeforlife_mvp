@@ -638,5 +638,8 @@ def assign_plantation(request, plantation_id):
     }
     return render(request, 'corporate/assign_plantation.html', context)
 
+def plantation_map_view(request):
+    return render(request, 'plantation/mapview.html')
+
 
 

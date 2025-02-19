@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plantation Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/map-styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <div class="logo">
+                <img src="{% static 'css/images/treeforlifelogo.png' %}" alt="Tree for Life Logo">
+            </div>
+            <div class="search-section">
+                <div class="search-container">
+                    <div class="search-wrapper">
+                        <input type="text" id="search-input" placeholder="Search plantations...">
+                        <button id="reset-button" class="reset-button">
+                            <span>↺</span> Reset Filter & Map
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-icon">🌳</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="states-count">0</div>
+                        <div class="stat-label">States</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🏡</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="plantations-count">0</div>
+                        <div class="stat-label">Plantations</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="owners-count">0</div>
+                        <div class="stat-label">Owners</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="companies-count">0</div>
+                        <div class="stat-label">Companies</div>
+                    </div>
+                </div>
+            </div>
+            <div class="map-toggle-container">
+                <div class="toggle-wrapper">
+                    <span class="mode-label">Map Style</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="mapStyleToggle" class="toggle-input" checked>
+                        <label for="mapStyleToggle" class="toggle-label">
+                            <span class="toggle-inner"></span>
+                            <span class="toggle-switch"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-text">
+                        <span class="focus-text">Focus Mode</span>
+                        <span class="detailed-text">Detailed Map</span>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                © <span id="currentYear"></span> TreeforLife.net All rights reserved. | Developed by <a href="https://codesiddhi.agency" target="_blank" style="color: inherit; text-decoration: none;">Codesiddhi Technologies LLP</a>
+            </div>
+        </div>
+        <div class="right-section">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="{% static 'js/dummy-data.js' %}"></script>
+    <script src="{% static 'js/map-main.js' %}"></script>
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html> 
