@@ -48,8 +48,6 @@ path('', views.homepage, name='homepage'),
     # Add this new URL pattern
     path('mapview/', views.plantation_map_view, name='plantation_map'),
     
-
-    
-
+   
 
 ]

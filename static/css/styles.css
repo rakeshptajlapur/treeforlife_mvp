@@ -278,6 +278,14 @@ footer {
     transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
 }
 
+#available-plantations, #employees {
+  height: 300px;
+}
 
-  
+#assign-btn, #unassign-btn {
+  width: 100%;
+}
+
+
+
 

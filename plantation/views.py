@@ -20,6 +20,8 @@ from django.db import DatabaseError
 from django.urls import reverse
 from django.http import JsonResponse
 import time
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 def send_email_async(subject, message, recipient_list):
     """Send email in a separate thread to avoid blocking the request."""
@@ -595,6 +597,11 @@ def add_employee(request):
 
 
 #for corporate admins to manage plantations list
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from .models import Plantation, Employee
+
 @login_required
 def manage_plantations(request):
     try:
@@ -604,10 +611,12 @@ def manage_plantations(request):
 
     # List ONLY the plantations that belong to this corporate
     plantations = Plantation.objects.filter(corporate=corporate).select_related('owner')
+    employees = Employee.objects.filter(corporate=corporate)
 
     context = {
         'corporate': corporate,
-        'plantations': plantations
+        'plantations': plantations,
+        'employees': employees,
     }
     return render(request, 'corporate/manage_plantations.html', context)
 
@@ -631,7 +640,7 @@ def assign_plantation(request, plantation_id):
         return redirect('manage_plantations')
 
     # GET request: show a form with a dropdown of employees
-    employees = corporate.employees.select_related('user')
+    employees = Employee.objects.filter(corporate=corporate).select_related('user')
     context = {
         'plantation': plantation,
         'employees': employees

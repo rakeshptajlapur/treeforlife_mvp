@@ -67,7 +67,7 @@
       <form method="POST" style="max-width: 500px;">
         {% csrf_token %}
         <div class="mb-3">
-          <label for="username" class="form-label">Username</label>
+          <label for="username" class="form-label">Username</label><span style="color: red; margin-left: 15px;">{use Employee ID as username}</span>
           <input 
             type="text" 
             name="username" 
@@ -89,7 +89,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">
-          <i class="bi bi-plus-circle"></i> Add
+          <i class="bi bi-plus-circle"></i> Add Employee
         </button>
       </form>
     </div>

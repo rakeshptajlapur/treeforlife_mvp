@@ -66,8 +66,8 @@
           <label for="employee_id" class="form-label">Choose Employee</label>
           <select name="employee_id" id="employee_id" class="form-select">
             {% for emp in employees %}
-            <option value="{{ emp.id }}">
-              {{ emp.user.username }} ({{ emp.user.email }})
+            <option value="{{ emp.id }}" {% if emp.user == plantation.owner %}selected{% endif %}>
+              {{ emp.user.username }} | {{ emp.user.email }} | {{ emp.user.plantation_set.count }} plantations
             </option>
             {% endfor %}
           </select>
