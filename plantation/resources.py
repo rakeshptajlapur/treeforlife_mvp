@@ -24,8 +24,8 @@ class PlantationResource(resources.ModelResource):
 
     class Meta:
         model = Plantation
-        fields = ('id', 'name', 'owner_email', 'created_at', 'updated_at')  # owner_email instead of owner
-        export_order = ('id', 'name', 'owner_email', 'created_at', 'updated_at')
+        fields = ('id', 'name', 'owner_email', 'created_at', 'updated_at', 'latitude', 'longitude', 'state')  # Include new fields
+        export_order = ('id', 'name', 'owner_email', 'created_at', 'updated_at', 'latitude', 'longitude', 'state')  # Ensure export order includes new fields
 
     def before_import_row(self, row, **kwargs):
         # Get the email and assign the owner

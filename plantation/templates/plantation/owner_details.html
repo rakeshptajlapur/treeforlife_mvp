@@ -33,7 +33,10 @@
                     <thead>
                         <tr>
                             <th>SL</th>
+                            <th>Plantation ID</th>
                             <th>Plant Name</th>
+                            <th>Coordinates</th>
+                            <th>State</th>
                             <th>Plantation Date</th>
                             <th>Certificate</th>
                         </tr>
@@ -42,11 +45,14 @@
                         {% for plantation in plantations %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
+                                <td>{{ plantation.plantation_id }}</td>
                                 <td>
                                     <a href="{% url 'plantation_details' plantation.id %}">
                                         {{ plantation.name }}
                                     </a>
                                 </td>
+                                <td>{{ plantation.latitude }}, {{ plantation.longitude }}</td>
+                                <td>{{ plantation.state }}</td>
                                 <td>{{ plantation.plantation_date|date:"F j, Y" }}</td>
                                 <td>
                                     {% if user.is_authenticated and owner == user %}
@@ -62,20 +68,18 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="4" class="text-center">No plantations available for this owner.</td>
+                                <td colspan="7" class="text-center">No plantations available for this owner.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
 
-
-
-
-
-                <h3>My Visit Requests</h3>
+                {% if user.is_authenticated and user == owner %}
+                    <h3>My Visit Requests</h3>
                     <table class="table table-bordered">
                         <thead class="table-dark">
                             <tr>
+                                <th>Plantation ID</th>
                                 <th>Plantation</th>
                                 <th>Check-in</th>
                                 <th>Check-out</th>
@@ -86,6 +90,7 @@
                         <tbody>
                             {% for request in visit_requests %}
                                 <tr>
+                                    <td>{{ request.plantation.plantation_id }}</td>
                                     <td>{{ request.plantation.name }}</td>
                                     <td>{{ request.check_in_date }}</td>
                                     <td>{{ request.check_out_date }}</td>
@@ -102,17 +107,12 @@
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="5" class="text-center">No visit requests found.</td>
+                                    <td colspan="6" class="text-center">No visit requests found.</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-
-
-
-
-
-
+                {% endif %}
             </div>
         </div>
     </div>

@@ -405,8 +405,8 @@ def owner_details(request, username):
     owner = get_object_or_404(User, username=username)
     plantations = Plantation.objects.filter(owner=owner)
 
-    # ✅ Get visit requests related to the owner
-    visit_requests = VisitRequest.objects.filter(owner=owner).order_by('-created_at')
+    # Get visit requests related to the owner, but only if the authenticated user is the owner
+    visit_requests = VisitRequest.objects.filter(owner=owner).order_by('-created_at') if request.user == owner else []
 
     # Hide email if the current user is not the owner
     email = owner.email if request.user.is_authenticated and request.user == owner else "Hidden"
@@ -420,7 +420,7 @@ def owner_details(request, username):
         'plantations': plantations,
         'email': email,
         'breadcrumbs': breadcrumbs,
-        'visit_requests': visit_requests,  # ✅ Pass visit requests to the template,
+        'visit_requests': visit_requests,  # Pass visit requests to the template
     })
 
 

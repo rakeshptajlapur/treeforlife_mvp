@@ -8,18 +8,31 @@
     <!-- Sidebar (20%) -->
     <div class="col-md-3 sidebar">
       <div class="text-left">
+        <a href="{{ plantation.image.url }}" target="_blank">
         <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" class="rounded-circle" width="150">
-      </div>
-      <h2 class="text-white">{{ plantation.name }}</h2>
-      <p class="text-white"><strong>Planted on:</strong> {{ plantation.plantation_date }}</p>
-      <p class="text-white">{{ plantation.description }}</p>
-      <hr>
-      <p class="text-white">
-        <strong>Owner:</strong> 
-        <a href="{% url 'owner_details' username=plantation.owner.username %}" class="text-white">
-          {{ plantation.owner.username }}
         </a>
-      </p>
+      </div>
+      <h2 class="text-white text-uppercase">{{ plantation.name|capfirst }}</h2>
+      <p class="text-white"><strong>Planted on:</strong> {{ plantation.plantation_date|capfirst }}</p>
+      <p class="text-white">{{ plantation.description|capfirst }}</p>
+      <hr class="bg-light">
+
+      <!-- Grouping Owner to Country -->
+      <div class="owner-info" style="font-size: 0.9rem; line-height: 1.2; font-style: italic; margin-top: 15px; background-color: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 5px;">
+        <p class="text-white"><strong>Owner:</strong> 
+          <a href="{% url 'owner_details' username=plantation.owner.username %}" class="text-white">
+            {{ plantation.owner.username|capfirst }}
+          </a>
+        </p>
+        <p class="text-white"><strong>ID:</strong> {{ plantation.plantation_id }}</p>
+        <p class="text-white"><strong>Coordinates:</strong> 
+          <a href="https://www.google.com/maps/search/?api=1&query={{ plantation.latitude }},{{ plantation.longitude }}" target="_blank" class="text-white">
+            {{ plantation.latitude }}, {{ plantation.longitude }}
+          </a>
+        </p>
+        <p class="text-white"><strong>State:</strong> {{ plantation.state|capfirst }}</p>
+        <p class="text-white"><strong>Country:</strong> <span class="font-weight-bold">India</span></p>
+      </div>
 
       <!-- Certificate Button -->
       <div class="mt-3">
@@ -77,29 +90,34 @@
 
     </div>
 
+    
+
     <!-- Timeline List Section (80%) -->
-    <div class="col-md-8 timeline" style="height: 400px; overflow-y: auto; border: 1px solid grey; padding: 40px; border-radius: 5px; background-color: aliceblue;">
+    <div class="col-md-8 timeline" style="height:650px; overflow-y: auto; border: 1px solid grey; padding: 40px; border-radius: 5px; background-color: aliceblue;">
       <h3>Timelines</h3>
       <p>Click on a timeline to view its details and add comments.</p>
       <ul class="list-group">
-        {% for timeline in plantation.timelines.all %}
-          <li class="list-group-item d-flex justify-content-between">
+        {% for timeline in timelines %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
             <div>
-              <a href="{% url 'timeline_details' plantation_id=plantation.id timeline_id=timeline.id %}" class="timeline-link">
-                <strong>{{ timeline.activity_date }}</strong>
-              </a>
-              <p>{{ timeline.description|truncatewords:20 }}</p>
+              <strong style="font-size: 13px; background-color: aqua; padding: 5px;">{{ timeline.activity_date }}</strong>
+              <h5 style="text-transform: capitalize; margin-top: 10px;">{{ timeline.activity_title }}</h5>
+              <p>{{ timeline.description|truncatewords:10 }}</p>
             </div>
-            <a href="{% url 'timeline_details' plantation_id=plantation.id timeline_id=timeline.id %}" class="btn btn-info btn-sm" style="text-align: center; color: white; padding: 20px 50px; background-color: rgb(76, 208, 76);">
+            <a href="{% url 'timeline_details' plantation_id=plantation.id timeline_id=timeline.id %}" class="btn btn-primary btn-sm" style="padding: 8px 15px; transition: background-color 0.3s;">
               See Details
             </a>
           </li>
+        {% empty %}
+          <li class="list-group-item text-center">No timelines available for this plantation.</li>
         {% endfor %}
       </ul>
-      
-
     </div>
+
+    
 
   </div>
 </div>
+
+
 {% endblock %}

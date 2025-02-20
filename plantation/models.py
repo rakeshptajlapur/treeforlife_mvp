@@ -44,6 +44,49 @@ class Plantation(models.Model):
         related_name='plantations'
     )  # New field
 
+    # New fields
+    latitude = models.FloatField(null=True, blank=True)  # Latitude
+    longitude = models.FloatField(null=True, blank=True)  # Longitude
+    STATE_CHOICES = [
+        ('Andhra Pradesh', 'Andhra Pradesh'),
+        ('Arunachal Pradesh', 'Arunachal Pradesh'),
+        ('Assam', 'Assam'),
+        ('Bihar', 'Bihar'),
+        ('Chhattisgarh', 'Chhattisgarh'),
+        ('Goa', 'Goa'),
+        ('Gujarat', 'Gujarat'),
+        ('Haryana', 'Haryana'),
+        ('Himachal Pradesh', 'Himachal Pradesh'),
+        ('Jharkhand', 'Jharkhand'),
+        ('Karnataka', 'Karnataka'),
+        ('Kerala', 'Kerala'),
+        ('Madhya Pradesh', 'Madhya Pradesh'),
+        ('Maharashtra', 'Maharashtra'),
+        ('Manipur', 'Manipur'),
+        ('Meghalaya', 'Meghalaya'),
+        ('Mizoram', 'Mizoram'),
+        ('Nagaland', 'Nagaland'),
+        ('Odisha', 'Odisha'),
+        ('Punjab', 'Punjab'),
+        ('Rajasthan', 'Rajasthan'),
+        ('Sikkim', 'Sikkim'),
+        ('Tamil Nadu', 'Tamil Nadu'),
+        ('Telangana', 'Telangana'),
+        ('Tripura', 'Tripura'),
+        ('Uttar Pradesh', 'Uttar Pradesh'),
+        ('Uttarakhand', 'Uttarakhand'),
+        ('West Bengal', 'West Bengal'),
+        ('Delhi', 'Delhi'),
+        ('Jammu and Kashmir', 'Jammu and Kashmir'),
+        ('Ladakh', 'Ladakh'),
+    ]
+    state = models.CharField(max_length=50, choices=STATE_CHOICES, null=True, blank=True)  # State dropdown
+
+    def plantation_id(self):
+        """Generate plantation ID in the format PLT-DDMMYY-ID."""
+        date_str = self.plantation_date.strftime('%d%m%y')
+        return f"PLT-{date_str}-{self.id}"
+
     def __str__(self):
         return self.name
 
@@ -67,10 +110,13 @@ class Plantation(models.Model):
 class Timeline(models.Model):
     plantation = models.ForeignKey(Plantation, on_delete=models.CASCADE, related_name='timelines')
     activity_date = models.DateField()
-    description = models.TextField()
+    activity_title = models.CharField(max_length=255, null=True, blank=True)  # Allow NULL values
+    description = models.TextField()  # This will be used as the activity description
+    activity_image = models.ImageField(upload_to='timeline_images/', null=True, blank=True)  # New field for activity image
+    video_url = models.URLField(max_length=200, null=True, blank=True)  # New field for video URL
 
     def __str__(self):
-        return f"{self.plantation.name} - {self.activity_date}: {self.description[:30]}"
+        return f"{self.activity_title} on {self.activity_date}"
 
 
 class Comment(models.Model):

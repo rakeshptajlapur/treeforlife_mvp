@@ -1,6 +1,18 @@
-<div class="timeline-details">
-  <h4>{{ timeline.activity_date }}</h4>
-  <p>{{ timeline.description }}</p>
+<div class="timeline-details" style="background-color: lightgrey; padding: 20px; border-radius: 5px;">
+  <h4>{{ timeline.activity_title }}</h4>
+  <p><strong>Date:</strong> {{ timeline.activity_date }}</p>
+  <p><strong>Description:</strong> {{ timeline.description }}</p>
+
+  {% if timeline.activity_image %}
+    <img src="{{ timeline.activity_image.url }}" alt="Activity Image" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px;">
+  {% endif %}
+
+  {% if timeline.video_url %}
+    <div style="margin-top: 10px;">
+      <strong>Video:</strong>
+      <iframe width="100%" height="315" src="{{ timeline.video_url }}" frameborder="0" allowfullscreen></iframe>
+    </div>
+  {% endif %}
 
   <!-- Display comments -->
   <h5>Comments:</h5>

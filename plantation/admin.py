@@ -48,15 +48,16 @@ class PlantationAdminForm(ModelForm):
 @admin.register(Plantation)
 class PlantationAdmin(ImportExportMixin, admin.ModelAdmin):
     form = PlantationAdminForm
-    list_display = ('name', 'owner', 'corporate', 'created_at', 'updated_at')
-    search_fields = ('name', 'owner__username', 'owner__email', 'corporate__name')
+    list_display = ('name', 'owner', 'corporate', 'created_at', 'updated_at', 'latitude', 'longitude', 'state')
+    search_fields = ('name', 'owner__username', 'owner__email', 'corporate__name', 'state')
     resource_class = PlantationResource
 
 @admin.register(Timeline)
 class TimelineAdmin(admin.ModelAdmin):
-    list_display = ('plantation', 'activity_date', 'description')
+    list_display = ('plantation', 'activity_date', 'activity_title', 'description')
     list_filter = ('plantation', 'activity_date')
-    search_fields = ('description',)
+    search_fields = ('activity_title', 'description',)
+    fields = ('plantation', 'activity_date', 'activity_title', 'description', 'activity_image', 'video_url')
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
