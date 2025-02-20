@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.contrib import messages
-from .models import Corporate, Employee, Plantation, Timeline, Comment
+from .models import Corporate, Employee, Plantation, Timeline, Comment, User
 import csv
 from django.http import HttpResponse
 from django.core.mail import send_mail
@@ -22,6 +22,9 @@ from django.http import JsonResponse
 import time
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.db.models import Count
+from django.db.models import Q  # Add this import at the top with other imports
+
 
 def send_email_async(subject, message, recipient_list):
     """Send email in a separate thread to avoid blocking the request."""
@@ -647,8 +650,37 @@ def assign_plantation(request, plantation_id):
     }
     return render(request, 'corporate/assign_plantation.html', context)
 
+
+
+
+
 def plantation_map_view(request):
-    return render(request, 'plantation/mapview.html')
+    # Real database queries
+    stats = {
+        'states_count': Plantation.objects.values('state').distinct().count(),
+        'plantations_count': Plantation.objects.count(),
+        'owners_count': User.objects.filter(
+            Q(plantation__isnull=False) | 
+            Q(corporate_account__isnull=False)
+        ).exclude(is_superuser=True).distinct().count(),
+        'companies_count': Corporate.objects.count()
+    }
 
+    # Get plantation data for map markers
+    plantations = Plantation.objects.select_related('owner', 'corporate').all()
+    plantation_data = [{
+        'id': p.id,
+        'name': p.name,
+        'latitude': p.latitude,
+        'longitude': p.longitude,
+        'state': p.state,
+        'owner': p.owner.username if p.owner else 'Unassigned',
+        'company': p.corporate.name if p.corporate else None
+    } for p in plantations]
 
-
+    context = {
+        'stats': stats,
+        'plantation_data': plantation_data
+    }
+    
+    return render(request, 'plantation/mapview.html', context)

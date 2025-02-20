@@ -29,28 +29,28 @@
                 <div class="stat-item">
                     <div class="stat-icon">🌳</div>
                     <div class="stat-info">
-                        <div class="stat-value" id="states-count">0</div>
+                        <div class="stat-value" id="states-count">{{ stats.states_count }}</div>
                         <div class="stat-label">States</div>
                     </div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-icon">🏡</div>
                     <div class="stat-info">
-                        <div class="stat-value" id="plantations-count">0</div>
+                        <div class="stat-value" id="plantations-count">{{ stats.plantations_count }}</div>
                         <div class="stat-label">Plantations</div>
                     </div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-icon">👥</div>
                     <div class="stat-info">
-                        <div class="stat-value" id="owners-count">0</div>
+                        <div class="stat-value" id="owners-count">{{ stats.owners_count }}</div>
                         <div class="stat-label">Owners</div>
                     </div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-icon">🏢</div>
                     <div class="stat-info">
-                        <div class="stat-value" id="companies-count">0</div>
+                        <div class="stat-value" id="companies-count">{{ stats.companies_count }}</div>
                         <div class="stat-label">Companies</div>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                 <div class="toggle-wrapper">
                     <span class="mode-label">Map Style</span>
                     <div class="toggle-switch">
-                        <input type="checkbox" id="mapStyleToggle" class="toggle-input" checked>
+                        <input type="checkbox" id="mapStyleToggle" class="toggle-input">
                         <label for="mapStyleToggle" class="toggle-label">
                             <span class="toggle-inner"></span>
                             <span class="toggle-switch"></span>
@@ -81,10 +81,12 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="{% static 'js/dummy-data.js' %}"></script>
+    <script>
+        const plantationData = {{ plantation_data|safe }};
+    </script>
     <script src="{% static 'js/map-main.js' %}"></script>
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
 </body>
-</html> 
+</html>

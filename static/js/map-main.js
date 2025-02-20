@@ -1,18 +1,58 @@
-// Initialize map
-const map = L.map('map', {
-    minZoom: 4,
-    maxZoom: 8,
-    zoomControl: true,
-    attributionControl: false
-}).setView([23.5937, 78.9629], 5);
+// Map style URLs
+const focusStyle = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const detailedStyle = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-// Use a cleaner base map
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    bounds: [[8.4, 68.7], [37.6, 97.25]],
+// Define India's bounds
+const indiaBounds = [
+    [8.4, 68.7],     // Southwest coordinates [lat, lng]
+    [37.6, 97.25]    // Northeast coordinates [lat, lng]
+];
+
+// Initialize map with bounds restriction
+const map = L.map('map', {
+    maxBounds: indiaBounds,    // Restrict panning
+    maxBoundsViscosity: 1.0,   // Make bounds edge "hard"
+    minZoom: 4,                // Restrict zoom out
+    maxZoom: 18               // Restrict zoom in
+}).fitBounds(indiaBounds);     // Set initial view to India
+
+// Initialize with detailed style
+let currentLayer = L.tileLayer(detailedStyle, {
+    attribution: '© OpenStreetMap contributors',
+    bounds: indiaBounds        // Restrict tile loading to India
 }).addTo(map);
 
-// Restrict map panning to India
-map.setMaxBounds([[8.4, 68.7], [37.6, 97.25]]);
+// Get elements
+const mapStyleToggle = document.getElementById('mapStyleToggle');
+const focusText = document.querySelector('.focus-text');
+const detailedText = document.querySelector('.detailed-text');
+
+// Initialize text states
+detailedText.classList.add('active');
+focusText.classList.remove('active');
+
+// Map style toggle handler
+mapStyleToggle.addEventListener('change', function() {
+    map.removeLayer(currentLayer);
+    
+    if (this.checked) {
+        // Focus mode
+        currentLayer = L.tileLayer(focusStyle, {
+            attribution: '© CartoDB',
+            bounds: indiaBounds
+        }).addTo(map);
+        focusText.classList.add('active');
+        detailedText.classList.remove('active');
+    } else {
+        // Detailed mode
+        currentLayer = L.tileLayer(detailedStyle, {
+            attribution: '© OpenStreetMap contributors',
+            bounds: indiaBounds
+        }).addTo(map);
+        detailedText.classList.add('active');
+        focusText.classList.remove('active');
+    }
+});
 
 // Custom marker icon with ripple effect
 const customIcon = L.divIcon({
@@ -39,7 +79,7 @@ plantationData.forEach(plantation => {
     suggestions.add(plantation.owner);
     suggestions.add(plantation.company);
 
-    const marker = L.marker([plantation.location.lat, plantation.location.lng], {
+    const marker = L.marker([plantation.latitude, plantation.longitude], {  // Changed from plantation.location.lat/lng
         icon: customIcon
     }).addTo(map);
 
@@ -65,10 +105,12 @@ plantationData.forEach(plantation => {
 });
 
 // Update stats
+/*
 document.getElementById('states-count').textContent = [...new Set(plantationData.map(item => item.state))].length;
 document.getElementById('plantations-count').textContent = plantationData.length;
 document.getElementById('owners-count').textContent = [...new Set(plantationData.map(item => item.owner))].length;
 document.getElementById('companies-count').textContent = [...new Set(plantationData.map(item => item.company))].length;
+*/
 
 // Create custom dropdown for search
 function createSearchDropdown() {
@@ -98,14 +140,14 @@ function handleSuggestionClick(suggestion) {
         } else if (suggestion.type === 'plantation' && plantation.name === suggestion.text) {
             addMarker(plantation);
             // Center map on selected plantation
-            map.setView([plantation.location.lat, plantation.location.lng], 7);
+            map.setView([plantation.latitude, plantation.longitude], 7);
         }
     });
 }
 
 // Add marker function
 function addMarker(plantation) {
-    const marker = L.marker([plantation.location.lat, plantation.location.lng], {
+    const marker = L.marker([plantation.latitude, plantation.longitude], {  // Changed from location.lat/lng
         icon: customIcon
     }).addTo(map);
 
@@ -113,8 +155,8 @@ function addMarker(plantation) {
         <div style="font-family: 'Poppins', sans-serif;">
             <strong>${plantation.name}</strong><br>
             ${plantation.state}<br>
-            <small>Owner: ${plantation.owner}</small><br>
-            <small>Company: ${plantation.company}</small>
+            <small>Owner: ${plantation.owner}</small>
+            ${plantation.company ? `<br><small>Company: ${plantation.company}</small>` : ''}
         </div>
     `, {
         offset: [0, -15],
@@ -258,41 +300,3 @@ function resetMap() {
 
 // Add click handler for reset button
 resetButton.addEventListener('click', resetMap);
-
-// Add after your map initialization
-const mapStyleToggle = document.getElementById('mapStyleToggle');
-const focusText = document.querySelector('.focus-text');
-const detailedText = document.querySelector('.detailed-text');
-
-// Define map styles
-const focusStyle = 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
-const detailedStyle = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-// Initialize with detailed mode
-let currentLayer = L.tileLayer(detailedStyle, {
-    bounds: [[8.4, 68.7], [37.6, 97.25]]
-}).addTo(map);
-
-detailedText.classList.add('active');
-focusText.classList.remove('active');
-
-mapStyleToggle.addEventListener('change', function() {
-    // Remove current layer
-    map.removeLayer(currentLayer);
-    
-    if (this.checked) {
-        // Detailed map
-        currentLayer = L.tileLayer(detailedStyle, {
-            bounds: [[8.4, 68.7], [37.6, 97.25]]
-        }).addTo(map);
-        detailedText.classList.add('active');
-        focusText.classList.remove('active');
-    } else {
-        // Focus mode
-        currentLayer = L.tileLayer(focusStyle, {
-            bounds: [[8.4, 68.7], [37.6, 97.25]]
-        }).addTo(map);
-        focusText.classList.add('active');
-        detailedText.classList.remove('active');
-    }
-}); 
