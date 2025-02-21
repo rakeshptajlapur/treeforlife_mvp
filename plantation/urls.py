@@ -6,7 +6,11 @@ from .views import book_visit
 
 
 urlpatterns = [
-path('', views.homepage, name='homepage'),
+
+    path('', views.map_home, name='homepage'),
+    
+    #---old homepage route---
+    path('old-home', views.homepage, name='homepage'),
     path('admin/', admin.site.urls),
 
     path('login/', views.login_view, name='login'),
@@ -45,8 +49,9 @@ path('', views.homepage, name='homepage'),
     #---visit request form---
     path('plantation/<int:plantation_id>/visit/', views.book_visit, name='book_visit'),
     
-    # Add this new URL pattern
-    path('mapview/', views.plantation_map_view, name='plantation_map'),
+   
+    # map from scratch ( actual map page which later will be integrated with the homepage)
+    # path('map-home/', views.map_home, name='map_home'),
     
    
 

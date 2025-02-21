@@ -24,6 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.db.models import Count
 from django.db.models import Q  # Add this import at the top with other imports
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 def send_email_async(subject, message, recipient_list):
@@ -652,10 +653,8 @@ def assign_plantation(request, plantation_id):
 
 
 
-
-
-def plantation_map_view(request):
-    # Real database queries
+def map_home(request):
+    # Get statistics
     stats = {
         'states_count': Plantation.objects.values('state').distinct().count(),
         'plantations_count': Plantation.objects.count(),
@@ -666,21 +665,25 @@ def plantation_map_view(request):
         'companies_count': Corporate.objects.count()
     }
 
-    # Get plantation data for map markers
-    plantations = Plantation.objects.select_related('owner', 'corporate').all()
-    plantation_data = [{
+    # Get plantations with coordinates
+    plantations = Plantation.objects.select_related('owner', 'corporate').filter(
+        latitude__isnull=False, 
+        longitude__isnull=False
+    )
+    
+    # Serialize plantation data
+    plantation_data = json.dumps([{
         'id': p.id,
+        'plantation_id': p.plantation_id(),  # Add the custom ID
         'name': p.name,
-        'latitude': p.latitude,
-        'longitude': p.longitude,
+        'latitude': float(p.latitude),
+        'longitude': float(p.longitude),
         'state': p.state,
         'owner': p.owner.username if p.owner else 'Unassigned',
         'company': p.corporate.name if p.corporate else None
-    } for p in plantations]
+    } for p in plantations], cls=DjangoJSONEncoder)
 
-    context = {
+    return render(request, 'plantation/map_home.html', {
         'stats': stats,
         'plantation_data': plantation_data
-    }
-    
-    return render(request, 'plantation/mapview.html', context)
+    })
