@@ -52,20 +52,39 @@ footer {
 
 /* Sidebar (Dark Background) */
 .col-md-3.sidebar {
-  background-color: #343a40; /* Sidebar background color */
+  background-color: #343a40; /* Dark background for sidebar */
   padding: 20px;
-  border-radius: 8px;
-  color: #fff;
+  border-radius: 10px; /* Rounded corners */
+  color: #fff; /* Text color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+/* Heading in Sidebar */
+.col-md-3.sidebar h2 {
+  font-size: 1.5rem; /* Increase font size for the heading */
+  margin-bottom: 15px; /* Space below the heading */
+}
+
+/* Paragraphs in Sidebar */
+.col-md-3.sidebar p {
+  margin: 10px 0; /* Space between paragraphs */
 }
 
 /* Links in Sidebar */
 .col-md-3.sidebar a {
-  color: #fff;
+  color: #00bfff; /* Light blue color for links */
+  transition: color 0.3s; /* Smooth transition for hover effect */
 }
 
 /* Hover effect for links in Sidebar */
 .col-md-3.sidebar a:hover {
-  text-decoration: underline;
+  text-decoration: underline; /* Underline on hover */
+  color: #fff; /* Change color on hover */
+}
+
+/* Strong text in Sidebar */
+.col-md-3.sidebar strong {
+  color: #ffd700; /* Gold color for strong text */
 }
 
 /* Timeline Section (Vibrant Accent) */
@@ -96,9 +115,9 @@ footer {
 
 /* Timeline Details Section (Light & Calm) */
 .col-md-5.timeline-details {
-  background-color: #fafad2; /* Light Goldenrod Yellow background */
+  background-color: lightgrey; /* Change background to light grey */
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 5px;
 }
 
 /* Italicize the heading in the Timeline Details Section */
@@ -217,7 +236,6 @@ footer {
   background-color: #fafad2; /* Soft yellow background for details */
 }
 
-
 .breadcrumb {
   background-color: transparent;
   padding: 0;
@@ -235,5 +253,39 @@ footer {
 .breadcrumb-item a:hover {
   text-decoration: underline;
 }
-  
+
+/* Styles for Owner Info Container */
+.col-md-3.sidebar .owner-info {
+    font-size: 0.9rem !important; /* Reduce font size */
+    line-height: 1.2 !important; /* Reduce line height */
+    font-style: italic; /* Italicize text */
+    margin-top: 15px !important; /* Space above the container */
+    background-color: rgba(255, 255, 255, 0.1) !important; /* Light background to make it stand out */
+    padding: 10px !important; /* Add padding for better spacing */
+    border-radius: 5px !important; /* Rounded corners for the background */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Bootstrap primary color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    color: white; /* Ensure text is white on hover */
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+}
+
+#available-plantations, #employees {
+  height: 300px;
+}
+
+#assign-btn, #unassign-btn {
+  width: 100%;
+}
+
+
+
 

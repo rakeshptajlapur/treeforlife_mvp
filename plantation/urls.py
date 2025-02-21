@@ -10,7 +10,7 @@ urlpatterns = [
     path('', views.map_home, name='homepage'),
     
     #---old homepage route---
-    path('old-home', views.homepage, name='homepage'),
+    path('old-home', views.homepage, name='old_homepage'),
     path('admin/', admin.site.urls),
 
     path('login/', views.login_view, name='login'),

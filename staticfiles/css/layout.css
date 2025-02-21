@@ -1,0 +1,119 @@
+/* Container */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
+}
+
+/* Layout Standard */
+.layout-standard {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* App Layout */
+.app-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;  /* 30/70 split approximately */
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    background: var(--background-white);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    height: 100vh;
+    position: fixed;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    text-align: center;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: var(--spacing-md);
+    overflow-y: auto;
+}
+
+.sidebar-footer {
+    padding: var(--spacing-md);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: var(--spacing-md) 0;
+    margin-left: 280px;  /* Same as sidebar width */
+    min-height: 100vh;
+    background: var(--background-light);
+    padding: var(--spacing-lg);
+}
+
+/* Auth Layout */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--spacing-xl) var(--spacing-sm);
+    max-width: 480px;
+    margin: 0 auto 0 150px;
+}
+
+/* Grid Layouts */
+.grid {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grid-2,
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .navbar-container {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .navbar-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .app-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;  /* Hide sidebar on mobile */
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .auth-container {
+        margin: 0 auto;
+        justify-content: center;
+    }
+}

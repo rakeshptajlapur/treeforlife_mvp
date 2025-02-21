@@ -1,123 +1,149 @@
 {% extends 'plantation/base.html' %}
 
-{% block title %}Plantation Details{% endblock %}
+{% block title %}{{ plantation.name|capfirst }} - Plantation Details{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="row">
-    <!-- Sidebar (20%) -->
-    <div class="col-md-3 sidebar">
-      <div class="text-left">
-        <a href="{{ plantation.image.url }}" target="_blank">
-        <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" class="rounded-circle" width="150">
-        </a>
-      </div>
-      <h2 class="text-white text-uppercase">{{ plantation.name|capfirst }}</h2>
-      <p class="text-white"><strong>Planted on:</strong> {{ plantation.plantation_date|capfirst }}</p>
-      <p class="text-white">{{ plantation.description|capfirst }}</p>
-      <hr class="bg-light">
-
-      <!-- Grouping Owner to Country -->
-      <div class="owner-info" style="font-size: 0.9rem; line-height: 1.2; font-style: italic; margin-top: 15px; background-color: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 5px;">
-        <p class="text-white"><strong>Owner:</strong> 
-          <a href="{% url 'owner_details' username=plantation.owner.username %}" class="text-white">
-            {{ plantation.owner.username|capfirst }}
-          </a>
-        </p>
-        <p class="text-white"><strong>ID:</strong> {{ plantation.plantation_id }}</p>
-        <p class="text-white"><strong>Coordinates:</strong> 
-          <a href="https://www.google.com/maps/search/?api=1&query={{ plantation.latitude }},{{ plantation.longitude }}" target="_blank" class="text-white">
-            {{ plantation.latitude }}, {{ plantation.longitude }}
-          </a>
-        </p>
-        <p class="text-white"><strong>State:</strong> {{ plantation.state|capfirst }}</p>
-        <p class="text-white"><strong>Country:</strong> <span class="font-weight-bold">India</span></p>
-      </div>
-
-      <!-- Certificate Button -->
-      <div class="mt-3">
-        {% if plantation.owner == request.user %}
-          <a href="{% url 'view_certificate' plantation.id %}" class="btn btn-info" target="_blank">
-            <i class="bi bi-file-earmark-check"></i> View Certificate
-          </a>
-        {% else %}
-          <button class="btn btn-secondary" disabled>
-            <i class="bi bi-file-earmark-check"></i> View Certificate
-          </button>
-        {% endif %}
-      </div>
-      <hr>
-
-  {% if user.is_authenticated and user == plantation.owner %}
-      {% if pending_request %}
-          <!-- If pending request exists, show modal trigger button -->
-          <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#pendingRequestModal">
-              <i class="bi bi-exclamation-circle"></i> Visit Request Pending
-          </button>
-  
-          <!-- Modal -->
-          <div class="modal fade" id="pendingRequestModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-              <div class="modal-dialog">
-                  <div class="modal-content">
-                      <div class="modal-header" style="color: black;">
-                          <h5 class="modal-title" id="modalTitle">🚨 Visit Request Pending</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body" style="color: black;">
-                          You already have a **pending visit request** for this plantation.  
-                          Please wait for approval from our team before booking another appointment.
-                      </div>
-                      <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK, Got It</button>
-                      </div>
+<div class="plantation-details">
+    <div class="details-grid">
+        <!-- Sidebar Info -->
+        <div class="details-sidebar">
+            <div class="header-section">
+                <div class="plantation-image">
+                    <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" class="rounded-image">
+                </div>
+                <div class="plantation-header">
+                    <h2>{{ plantation.name|capfirst }}</h2>
+                    <p class="plantation-date"><i class="bi bi-calendar3"></i> {{ plantation.plantation_date|date:"F j, Y" }}</p>
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ plantation.latitude }},{{ plantation.longitude }}" 
+                    target="_blank" 
+                    title="View on Google Maps">
+                     <i class="bi bi-geo-alt"></i> View on Map
+                 </a>
+                
+                
                   </div>
-              </div>
-          </div>
-      {% else %}
-          <!-- Normal Book Appointment Button -->
-          <a href="{% url 'book_visit' plantation.id %}" class="btn btn-outline-primary btn-sm">
-              <i class="bi bi-calendar-plus"></i> Book Appointment
-          </a>
-      {% endif %}
-  {% else %}
-      <button class="btn btn-secondary btn-sm" disabled>
-          <i class="bi bi-calendar-x"></i> Book Appointment (Owner Only)
-      </button>
-  {% endif %}
-  
-<hr>
-
-
-    </div>
-
-    
-
-    <!-- Timeline List Section (80%) -->
-    <div class="col-md-8 timeline" style="height:650px; overflow-y: auto; border: 1px solid grey; padding: 40px; border-radius: 5px; background-color: aliceblue;">
-      <h3>Timelines</h3>
-      <p>Click on a timeline to view its details and add comments.</p>
-      <ul class="list-group">
-        {% for timeline in timelines %}
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong style="font-size: 13px; background-color: aqua; padding: 5px;">{{ timeline.activity_date }}</strong>
-              <h5 style="text-transform: capitalize; margin-top: 10px;">{{ timeline.activity_title }}</h5>
-              <p>{{ timeline.description|truncatewords:10 }}</p>
             </div>
-            <a href="{% url 'timeline_details' plantation_id=plantation.id timeline_id=timeline.id %}" class="btn btn-primary btn-sm" style="padding: 8px 15px; transition: background-color 0.3s;">
-              See Details
-            </a>
-          </li>
-        {% empty %}
-          <li class="list-group-item text-center">No timelines available for this plantation.</li>
-        {% endfor %}
-      </ul>
+
+            <div class="action-buttons">
+              {% if plantation.owner == request.user %}
+                  <a href="{% url 'view_certificate' plantation.id %}" class="btn btn-primary btn-block" target="_blank">
+                      <i class="bi bi-award"></i> View Certificate
+                  </a>
+              {% endif %}
+
+              {% if user.is_authenticated and user == plantation.owner %}
+                  {% if pending_request %}
+                      <button type="button" class="btn btn-warning btn-block" data-bs-toggle="modal" data-bs-target="#pendingRequestModal">
+                          <i class="bi bi-hourglass-split"></i> Visit Request Pending
+                      </button>
+                  {% else %}
+                      <a href="{% url 'book_visit' plantation.id %}" class="btn btn-book-appointment btn-block">
+                          <i class="bi bi-calendar2-plus"></i> Book Appointment
+                      </a>
+                  {% endif %}
+              {% endif %}
+          </div>
+
+          
+
+            <div class="info-card">
+                <div class="info-group">
+                    <label>Owner</label>
+                    <p>
+                        <a href="{% url 'owner_details' username=plantation.owner.username %}">
+                            {{ plantation.owner.username|capfirst }}
+                        </a>
+                    </p>
+                </div>
+
+                <div class="info-group">
+                    <label>Plantation ID</label>
+                    <p>{{ plantation.plantation_id }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Location</label>
+                    <p>
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ plantation.latitude }},{{ plantation.longitude }}" 
+                           target="_blank" 
+                           title="View on Google Maps">
+                            <i class="bi bi-geo-alt"></i> View on Map
+                        </a>
+                    </p>
+                </div>
+
+                <div class="info-group">
+                    <label>State</label>
+                    <p>{{ plantation.state|capfirst }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Country</label>
+                    <p>India</p>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Timeline Section -->
+        <div class="timeline-section">
+            <div class="section-header">
+                <h3>Timelines</h3>
+                <p>Click on a timeline to view its details and add comments.</p>
+            </div>
+
+            <div class="timeline-list">
+                {% for timeline in timelines %}
+                    <div class="timeline-card">
+                        <div class="timeline-content">
+                            <span class="timeline-date">
+                                <i class="bi bi-calendar3"></i> {{ timeline.activity_date|date:"F j, Y" }}
+                            </span>
+                            <h4 class="timeline-title">
+                                <i class="bi bi-activity"></i> {{ timeline.activity_title|capfirst }}
+                            </h4>
+                            <p class="timeline-desc">{{ timeline.description|truncatewords:8 }}</p>
+                        </div>
+                        <a href="{% url 'timeline_details' plantation_id=plantation.id timeline_id=timeline.id %}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-arrow-right-circle"></i> Read More
+                        </a>
+                    </div>
+                {% empty %}
+                    <div class="empty-state">
+                        <p>No timelines available for this plantation.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-
-    
-
-  </div>
 </div>
 
-
+{% if pending_request %}
+<div class="modal fade" id="pendingRequestModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">
+                    <i class="bi bi-exclamation-triangle-fill text-warning"></i> Visit Request Pending
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-info-circle text-info"></i>
+                    <p class="mb-0">You already have a pending visit request for this plantation.
+                    Please wait for approval from our team before booking another appointment.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-check-circle"></i> OK, Got It
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

@@ -1,119 +1,106 @@
 {% extends 'plantation/base.html' %}
+{% load static %}
 
-{% block title %}Owner Details{% endblock %}
+{% block title %}Owner Details - TreeForLife{% endblock %}
 
 {% block content %}
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Left Sidebar (30%) -->
-            <div class="col-md-3 bg-dark text-white" style="min-height: 400px; padding: 20px; margin-top: 30px;">
-                <h3>Owner Details</h3>
-                <hr>
-                <p><strong>Name:</strong> {{ owner.username }}</p>
-                
-                {% if user.is_authenticated and owner == user %}
-                    <p><strong>Email:</strong> {{ owner.email }}</p>
-                {% else %}
-                    <p><strong>Email:</strong> <span style="color: #888;">(Hidden for visitors)</span></p>
-                {% endif %}
-                
-                <hr>
-                {% if user.is_authenticated and owner == user %}
-                    <form method="POST" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger w-100">Logout</button>
-                    </form>
-                {% endif %}
-            </div>
+<div class="owner-details-container">
+    <h2><i class="bi bi-person-circle"></i> Owner Details</h2>
+    <p><strong><i class="bi bi-person"></i> Name:</strong> {{ owner.username|title }}</p>
+    {% if user.is_authenticated and owner == user %}
+        <p><strong><i class="bi bi-envelope"></i> Email:</strong> {{ owner.email }}</p>
+    {% endif %}
 
-            <!-- Right Side Content (70%) -->
-            <div class="col-md-8 bg-white" style="padding: 20px;">
-                <h3>Plantations</h3>
-                <table class="table table-striped">
+    <h3><i class="bi bi-tree"></i> Plantations</h3>
+    {% if plantations %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-hash"></i> SL</th>
+                        <th><i class="bi bi-upc"></i> Plantation ID</th>
+                        <th><i class="bi bi-flower1"></i> Plant Name</th>
+                        <th><i class="bi bi-geo-alt"></i> Coordinates</th>
+                        <th><i class="bi bi-map"></i> State</th>
+                        <th><i class="bi bi-calendar3"></i> Plantation Date</th>
+                        <th><i class="bi bi-award"></i> Certificate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plantation in plantations %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ plantation.plantation_id }}</td>
+                            <td>
+                                <a href="{% url 'plantation_details' plantation.id %}">
+                                    <i class="bi bi-link-45deg"></i> {{ plantation.name }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="https://www.google.com/maps/search/?api=1&query={{ plantation.latitude }},{{ plantation.longitude }}" 
+                                   target="_blank" 
+                                   title="View on Google Maps">
+                                    <i class="bi bi-geo-alt"></i> {{ plantation.latitude }}, {{ plantation.longitude }}
+                                </a>
+                            </td>
+                            <td>{{ plantation.state }}</td>
+                            <td>{{ plantation.plantation_date|date:"F j, Y" }}</td>
+                            <td>
+                                {% if user.is_authenticated and owner == user %}
+                                    <a href="{% url 'view_certificate' plantation.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark-text"></i> View
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p><i class="bi bi-exclamation-circle"></i> No plantations found.</p>
+    {% endif %}
+
+    {% if user.is_authenticated and owner == user %}
+        <h3><i class="bi bi-calendar-check"></i> My Visit Requests</h3>
+        {% if visit_requests %}
+            <div class="table-container">
+                <table>
                     <thead>
                         <tr>
-                            <th>SL</th>
-                            <th>Plantation ID</th>
-                            <th>Plant Name</th>
-                            <th>Coordinates</th>
-                            <th>State</th>
-                            <th>Plantation Date</th>
-                            <th>Certificate</th>
+                            <th><i class="bi bi-upc"></i> Plantation ID</th>
+                            <th><i class="bi bi-flower1"></i> Plantation</th>
+                            <th><i class="bi bi-calendar-event"></i> Check-in</th>
+                            <th><i class="bi bi-calendar-x"></i> Check-out</th>
+                            <th><i class="bi bi-people"></i> Visitors</th>
+                            <th><i class="bi bi-clipboard-check"></i> Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for plantation in plantations %}
+                        {% for request in visit_requests %}
                             <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ plantation.plantation_id }}</td>
+                                <td>{{ request.plantation.plantation_id }}</td>
+                                <td>{{ request.plantation.name }}</td>
+                                <td>{{ request.check_in_date }}</td>
+                                <td>{{ request.check_out_date }}</td>
+                                <td>{{ request.visitors }}</td>
                                 <td>
-                                    <a href="{% url 'plantation_details' plantation.id %}">
-                                        {{ plantation.name }}
-                                    </a>
-                                </td>
-                                <td>{{ plantation.latitude }}, {{ plantation.longitude }}</td>
-                                <td>{{ plantation.state }}</td>
-                                <td>{{ plantation.plantation_date|date:"F j, Y" }}</td>
-                                <td>
-                                    {% if user.is_authenticated and owner == user %}
-                                        <a href="{% url 'view_certificate' plantation.id %}" class="btn btn-info btn-sm " target="_blank">
-                                            View Certificate
-                                        </a>
+                                    {% if request.status == 'Pending' %}
+                                        <span class="badge bg-warning"><i class="bi bi-hourglass-split"></i> {{ request.status }}</span>
+                                    {% elif request.status == 'Approved' %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> {{ request.status }}</span>
                                     {% else %}
-                                        <button class="btn btn-secondary btn-sm" disabled>
-                                            View Certificate
-                                        </button>
+                                        <span class="badge bg-danger"><i class="bi bi-x-circle"></i> {{ request.status }}</span>
                                     {% endif %}
                                 </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="7" class="text-center">No plantations available for this owner.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-
-                {% if user.is_authenticated and user == owner %}
-                    <h3>My Visit Requests</h3>
-                    <table class="table table-bordered">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Plantation ID</th>
-                                <th>Plantation</th>
-                                <th>Check-in</th>
-                                <th>Check-out</th>
-                                <th>Visitors</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for request in visit_requests %}
-                                <tr>
-                                    <td>{{ request.plantation.plantation_id }}</td>
-                                    <td>{{ request.plantation.name }}</td>
-                                    <td>{{ request.check_in_date }}</td>
-                                    <td>{{ request.check_out_date }}</td>
-                                    <td>{{ request.visitors }}</td>
-                                    <td>
-                                        {% if request.status == "Pending" %}
-                                            <span class="badge bg-warning">Pending</span>
-                                        {% elif request.status == "Approved" %}
-                                            <span class="badge bg-success">Approved</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Rejected</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="6" class="text-center">No visit requests found.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
             </div>
-        </div>
-    </div>
+        {% else %}
+            <p><i class="bi bi-info-circle"></i> No visit requests found.</p>
+        {% endif %}
+    {% endif %}
+</div>
 {% endblock %}

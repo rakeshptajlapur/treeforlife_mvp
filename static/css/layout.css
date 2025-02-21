@@ -1,0 +1,159 @@
+/* Container */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
+}
+
+/* Layout Standard */
+.layout-standard {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* App Layout */
+.app-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;  /* Important: This sets the sidebar and main content width */
+    min-height: 100vh;
+    padding-right: var(--spacing-lg);  /* Add right padding to app layout */
+}
+
+/* Sidebar */
+.sidebar {
+    background: var(--background-white);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    height: 100vh;
+    position: fixed;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+}
+
+/* Main Content Area */
+.main-content {
+    grid-column: 2; /* Force content to second column */
+    min-height: 100vh;
+    padding: var(--spacing-lg);
+    background-color: var(--background-light);
+    width: 95%;  /* Set width to 90% */
+    margin: 0 auto;  /* Center align */
+    max-width: 1000px;/* Optional: prevent too wide on large screens */
+}
+
+.sidebar-header {
+    text-align: center;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: var(--spacing-md);
+    overflow-y: auto;
+}
+
+.sidebar-footer {
+    padding: var(--spacing-md);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Owner Details Container */
+.owner-details-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: var(--spacing-lg);
+}
+
+/* Auth Layout */
+.auth-layout {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-light);
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 480px;
+    padding: var(--spacing-xl) var(--spacing-sm);
+    margin: 0 auto;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-sm);
+}
+
+/* Profile Layout */
+.profile-container {
+    display: grid;
+    gap: var(--spacing-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Cards Layout */
+.profile-card, 
+.content-card {
+    background: var(--background-white);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Grid Layouts */
+.grid {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grid-2,
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .navbar-container {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .navbar-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .app-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;  /* Hide sidebar on mobile */
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .auth-container {
+        margin: 0 auto;
+        justify-content: center;
+    }
+}

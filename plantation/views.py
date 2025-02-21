@@ -410,25 +410,19 @@ def logout_view(request):
 def owner_details(request, username):
     owner = get_object_or_404(User, username=username)
     plantations = Plantation.objects.filter(owner=owner)
+    visit_requests = VisitRequest.objects.filter(owner=owner)
 
-    # Get visit requests related to the owner, but only if the authenticated user is the owner
-    visit_requests = VisitRequest.objects.filter(owner=owner).order_by('-created_at') if request.user == owner else []
+    # Add print statements for debugging
+    print(f"Debug - Owner: {owner.username}")
+    print(f"Debug - Plantations count: {plantations.count()}")
+    print(f"Debug - Visit requests count: {visit_requests.count()}")
 
-    # Hide email if the current user is not the owner
-    email = owner.email if request.user.is_authenticated and request.user == owner else "Hidden"
-
-    breadcrumbs = [
-        {'name': 'Home', 'url': reverse('homepage')},
-        {'name': f"Owner: {owner.username}", 'url': None}
-    ]
-    return render(request, "plantation/owner_details.html", {
+    context = {
         'owner': owner,
         'plantations': plantations,
-        'email': email,
-        'breadcrumbs': breadcrumbs,
-        'visit_requests': visit_requests,  # Pass visit requests to the template
-    })
-
+        'visit_requests': visit_requests,
+    }
+    return render(request, 'plantation/owner_details.html', context)
 
 
 def plantation_details(request, id):
