@@ -35,25 +35,41 @@
 
             <nav class="sidebar-nav">
                 {% if user.is_authenticated %}
-                    <div class="user-welcome">
-                        <p>Welcome back,</p>
-                        <h3>{{ user.first_name }}</h3>
-                    </div>
+                
+                    
+
+                    <!-- Corporate Admin Navigation -->
+                    {% if is_corporate_admin %}
                     <div class="nav-section">
-                        <h4 class="nav-title">Plantations</h4>
-                        <a href="{% url 'homepage' %}" target="_blank" class="nav-link {% if request.path == '/' %}active{% endif %}">
-                            <i class="bi bi-map"></i> Map View
+                        <h4 class="nav-title">Corporate Management</h4>
+                        <a href="{% url 'corporate_dashboard' %}" class="nav-link {% if 'corporate_dashboard' in request.path %}active{% endif %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
-                        {% if is_corporate_admin %}
-                            <a href="{% url 'corporate_dashboard' %}" class="nav-link">
-                                <i class="bi bi-speedometer2"></i> Dashboard
-                            </a>
-                        {% else %}
-                            <a href="{% url 'owner_details' username=user.username %}" class="nav-link">
-                                <i class="bi bi-person"></i> My Profile
-                            </a>
-                        {% endif %}
+                        <a href="{% url 'manage_employees' %}" class="nav-link {% if 'manage_employees' in request.path %}active{% endif %}">
+                            <i class="bi bi-people"></i> Manage Employees
+                        </a>
+                        <a href="{% url 'manage_plantations' %}" class="nav-link {% if 'manage_plantations' in request.path %}active{% endif %}">
+                            <i class="bi bi-tree"></i> Manage Plantations
+                        </a>
                     </div>
+                    {% else %}
+                    <!-- Regular User Navigation -->
+                    <div class="nav-section">
+                        <h4 class="nav-title">My Account</h4>
+                        <a href="{% url 'owner_details' username=user.username %}" class="nav-link {% if 'owner_details' in request.path %}active{% endif %}">
+                            <i class="bi bi-person"></i> My Profile
+                        </a>
+                    </div>
+                    {% endif %}
+
+<!-- Common Navigation Section -->
+<div class="nav-section">
+    <h4 class="nav-title">Plantations</h4>
+    <a href="{% url 'homepage' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+        <i class="bi bi-map"></i> Map View
+    </a>
+</div>
+
                 {% endif %}
             </nav>
 

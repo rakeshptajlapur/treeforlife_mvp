@@ -4,152 +4,125 @@
 {% block title %}Manage Employees{% endblock %}
 
 {% block content %}
-<div class="container-fluid" style="overflow-x: hidden;"> <!-- Use container-fluid for full-width layout -->
-  <div class="row" style="display: flex; flex-wrap: nowrap; min-height: 70vh;">
-
-    <!-- Sidebar -->
-    <div class="col-md-3"
-         style="
-           background-color: #343a40;
-           color: #fff;
-           padding: 30px;
-           border-radius: 30px;
-           flex-basis: 25%; /* Ensures consistent width */
-           overflow: hidden; /* Prevents side scrolling in the sidebar */
-         ">
-      <h5 style="margin-bottom: 30px;">
-        <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>
-        Corporate Dashboard
-      </h5>
-
-      <ul class="nav flex-column" style="gap: 10px;">
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'corporate_dashboard' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-house-door" style="margin-right: 5px;"></i>
-            Dashboard
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'manage_employees' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-people" style="margin-right: 5px;"></i>
-            Manage Employees
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'manage_plantations' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-tree-fill" style="margin-right: 5px;"></i>
-            Manage Plantations
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Main Content -->
-    <div class="col-md-9"
-         style="
-           padding: 50px;
-           background-color: #e1eefa;
-           border-radius: 20px;
-           overflow-x: hidden;
-           flex-basis: 75%; /* Adjust width dynamically */
-         ">
-      <h2 class="mb-4">
-        <i class="bi bi-people" style="margin-right: 8px;"></i>
-        {{ corporate.name }} - Employees
-      </h2>
-
-      <p>Employee Credits: {{ corporate.employee_credits }}</p>
-      <p>Current count: {{ employees.count }}</p>
-
-      <!-- Import/Export and Add Employee Buttons -->
-      <div class="d-flex justify-content-between mt-4">
-        <div>
-          <a href="{% url 'export_employees' %}" class="btn btn-success">
-            <i class="bi bi-download"></i> Download | Export Employees
-          </a>
-          
-          <!-- Import Button with Modal Trigger -->
-          <button id="import-employees-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">
-            <i class="bi bi-upload"></i> Upload | Import Employees
-          </button>
+<div class="corporate-dashboard" style="padding: 24px; max-width: 1400px; margin: 0 auto; background: #f8fafc;">
+    <!-- Page Header -->
+    <div class="page-header" style="background: white; border-radius: 12px; padding: 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div class="header-content">
+            <h4 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-people"></i> Manage Employees
+            </h4>
+            <p style="margin: 8px 0 0; color: #64748b;">Manage your organization's employees</p>
         </div>
-
-        <!-- Add Employee Button -->
-        <a href="{% url 'add_employee' %}" class="btn btn-primary">
-          <i class="bi bi-plus-circle"></i> Add Employee
-        </a>
-      </div>
-
-      <!-- Scrollable Table Container -->
-      <div style="max-height: 300px; overflow-y: auto; margin-top: 20px;">
-        <table class="table table-hover table-bordered" style="background-color: #fff; width: 100%;">
-          <thead class="table-dark">
-            <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Plantation Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for emp in employees %}
-              <tr>
-                <td>{{ emp.user.username }}</td>
-                <td>{{ emp.user.email }}</td>
-                <td>
-                  {% if emp.user.plantation_set.count > 0 %}
-                    <a href="{% url 'owner_details' emp.user.username %}">
-                      Yes ({{ emp.user.plantation_set.count }})
-                    </a>
-                  {% else %}
-                    No
-                  {% endif %}
-                </td>
-                <td>
-                  {% if emp.user.plantation_set.count == 0 %}
-                    <a href="{% url 'delete_employee' emp.id %}" class="text-danger" title="Delete Employee">
-                      <i class="bi bi-x-circle"></i>
-                    </a>
-                  {% else %}
-                    <span class="text-secondary" title="Cannot delete: plantations assigned">
-                      <i class="bi bi-x-circle-fill"></i>
-                    </span>
-                  {% endif %}
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+        <div class="stats-badge" style="display: flex; gap: 12px;">
+            <span style="background: #EEF2FF; color: #474bff; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-person-badge"></i> Credits: {{ corporate.employee_credits }}
+            </span>
+            <span style="background: #ECFDF5; color: #2ecc71; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-people-fill"></i> Active: {{ employees.count }}
+            </span>
+        </div>
     </div>
-  </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar" style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <a href="{% url 'add_employee' %}" class="btn" style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;">
+                    <i class="bi bi-plus-circle"></i> Add Employee
+                </a>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="{% url 'export_employees' %}" class="btn" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; margin-right: 8px;">
+                    <i class="bi bi-download"></i> Export Employees
+                </a>
+                <button class="btn" data-bs-toggle="modal" data-bs-target="#importModal" style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;">
+                    <i class="bi bi-upload"></i> Import Employees
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employees Table -->
+    <div class="table-container" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <table class="table" style="margin-bottom: 0;">
+            <thead style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white;">
+                <tr>
+                    <th style="padding: 16px; font-weight: 500; border: none;">#</th>
+                    <th style="padding: 16px; font-weight: 500; border: none;">
+                        <i class="bi bi-person"></i> Username
+                    </th>
+                    <th style="padding: 16px; font-weight: 500; border: none;">
+                        <i class="bi bi-envelope"></i> Email
+                    </th>
+                    <th style="padding: 16px; font-weight: 500; border: none;">
+                        <i class="bi bi-tree"></i> Plantation Status
+                    </th>
+                    <th style="padding: 16px; font-weight: 500; border: none; width: 100px;">
+                        <i class="bi bi-gear"></i> Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                <tr style="transition: background 0.2s ease;">
+                    <td style="padding: 16px; vertical-align: middle;">{{ forloop.counter }}</td>
+                    <td style="padding: 16px; vertical-align: middle;">{{ emp.user.username }}</td>
+                    <td style="padding: 16px; vertical-align: middle;">{{ emp.user.email }}</td>
+                    <td style="padding: 16px; vertical-align: middle;">
+                        {% if emp.user.plantation_set.count > 0 %}
+                        <span style="background: #ECFDF5; color: #2ecc71; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-check-circle"></i> Active ({{ emp.user.plantation_set.count }})
+                        </span>
+                        {% else %}
+                        <span style="background: #FEF3C7; color: #D97706; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-dash-circle"></i> No Plantations
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 16px; vertical-align: middle;">
+                        {% if emp.user.plantation_set.count == 0 %}
+                        <a href="{% url 'delete_employee' emp.id %}" class="btn" style="background: #FEE2E2; color: #EF4444; border: none; width: 32px; height: 32px; padding: 0; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        {% else %}
+                        <button disabled class="btn" style="background: #F3F4F6; color: #9CA3AF; border: none; width: 32px; height: 32px; padding: 0; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: not-allowed;">
+                            <i class="bi bi-lock"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Modal for Import -->
-<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="importModalLabel">Import Employees</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="import-employees-form" method="POST" enctype="multipart/form-data" action="{% url 'import_employees' %}">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label for="csvFile" class="form-label">Upload CSV File</label>
-            <input class="form-control" type="file" id="csvFile" name="csv_file" accept=".csv" required>
-          </div>
-          <button type="submit" class="btn btn-primary">Upload</button>
-        </form>
-      </div>
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 12px; border: none;">
+            <div class="modal-header" style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white; border: none; border-radius: 12px 12px 0 0;">
+                <h5 class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-upload"></i> Import Employees
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: brightness(0) invert(1);"></button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <form id="import-employees-form" method="POST" enctype="multipart/form-data" action="{% url 'import_employees' %}">
+                    {% csrf_token %}
+                    <div style="border: 2px dashed #E5E7EB; border-radius: 12px; padding: 32px; text-align: center; cursor: pointer;">
+                        <label for="csvFile" style="cursor: pointer;">
+                            <i class="bi bi-cloud-upload" style="font-size: 2rem; color: #474bff; margin-bottom: 12px;"></i>
+                            <p style="margin: 0; color: #6B7280;">Choose CSV file or drag it here</p>
+                        </label>
+                        <input class="form-control" type="file" id="csvFile" name="csv_file" accept=".csv" required style="display: none;">
+                    </div>
+                    <button type="submit" class="btn w-100 mt-3" style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="bi bi-check-circle"></i> Upload File
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

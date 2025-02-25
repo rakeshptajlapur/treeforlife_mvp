@@ -1,116 +1,92 @@
 {% extends 'plantation/base.html' %}
 {% load static %}
 
-{% block title %}Manage Plantations | Corporate{% endblock %}
+{% block title %}Manage Plantations{% endblock %}
 
 {% block content %}
-<div style="margin: 0 auto; max-width: 1200px;">
-  <div class="row" style="display: flex; flex-wrap: nowrap; min-height: 70vh;">
-
-    <!-- Sidebar -->
-    <div class="col-md-3"
-         style="
-           background-color: #343a40; 
-           color: #fff; 
-           padding: 30px;
-           border-radius: 30px;
-         ">
-      <h5 style="margin-bottom: 30px;">
-        <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>
-        Corporate Dashboard
-      </h5>
-
-      <ul class="nav flex-column" style="gap: 10px;">
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'corporate_dashboard' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-house-door" style="margin-right: 5px;"></i>
-            Dashboard
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'manage_employees' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-people" style="margin-right: 5px;"></i>
-            Manage Employees
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'manage_plantations' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-tree-fill" style="margin-right: 5px;"></i>
-            Manage Plantations
-          </a>
-        </li>
-      </ul>
+<div class="corporate-dashboard" style="padding: 24px; max-width: 1400px; margin: 0 auto; background: #f8fafc;">
+    <!-- Page Header -->
+    <div class="page-header" style="background: white; border-radius: 12px; padding: 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div class="header-content">
+            <h4 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-tree-fill"></i> Manage Plantations
+            </h4>
+            <p style="margin: 8px 0 0; color: #64748b;">Manage your organization's plantations</p>
+        </div>
+        <div class="stats-badge" style="display: flex; gap: 12px;">
+            <span style="background: #EEF2FF; color: #474bff; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-tree"></i> Credits: {{ corporate.plantation_credits }}
+            </span>
+            <span style="background: #ECFDF5; color: #2ecc71; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-tree-fill"></i> Active: {{ plantations.count }}
+            </span>
+        </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="col-md-9"
-         style="
-           padding: 50px; 
-           background-color: #e1eefa; 
-           border-radius: 20px;
-         ">
-      <h2 class="mb-4">
-        <i class="bi bi-tree-fill" style="margin-right: 8px;"></i>
-        {{ corporate.name }} - Plantations
-      </h2>
-
-      <!-- Plantation Credits & Usage -->
-      <p>Plantation Credits: {{ corporate.plantation_credits }}</p>
-      <p>Plantations Used: {{ plantations.count }}</p>
-
-      <!-- Export Button -->
-      <div class="d-flex justify-content-between mt-4">
-        <a href="{% url 'export_plantations' %}" class="btn btn-success">
-          <i class="bi bi-download"></i> Download | Export Plantations
-        </a>
-      </div>
-
-      <!-- Scrollable Table Container -->
-      <div style="max-height: 400px; overflow-y: auto; margin-top: 20px;">
-        <table class="table table-hover table-bordered" style="background-color: #fff; margin-top: 20px;">
-          <thead class="table-dark">
-            <tr>
-              <th>Plantation ID</th>
-              <th>Plantation Name</th>
-              <th>Latitude/Longitude</th>
-              <th>Assigned To</th>
-              <th style="min-width: 130px;">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for p in plantations %}
-            <tr>
-              <td>{{ p.plantation_id }}</td>
-              <td>
-                <a href="{% url 'plantation_details' p.id %}">{{ p.name }}</a>
-              </td>
-              <td>
-                <a href="https://www.google.com/maps/search/?api=1&query={{ p.latitude }},{{ p.longitude }}" target="_blank">
-                  {{ p.latitude }}, {{ p.longitude }}
+    <!-- Action Bar -->
+    <div class="action-bar" style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <!-- Left side actions if needed -->
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="{% url 'export_plantations' %}" class="btn" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;">
+                    <i class="bi bi-download"></i> Export Plantations
                 </a>
-              </td>
-              <td>
-                {% if p.owner %}
-                  {{ p.owner.username }}
-                {% else %}
-                  Unassigned
-                {% endif %}
-              </td>
-              <td>
-                <a href="{% url 'assign_plantation' p.id %}" class="btn btn-outline-primary btn-sm">Assign / Reassign</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Plantations Table -->
+    <div class="table-container" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <table class="table" style="margin-bottom: 0;">
+            <thead style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white;">
+                <tr>
+                    <th style="padding: 16px; font-weight: 500; border: none;">#</th>
+                    <th style="padding: 16px; font-weight: 500; border: none;"><i class="bi bi-hash"></i> Plantation ID</th>
+                    <th style="padding: 16px; font-weight: 500; border: none;"><i class="bi bi-tree"></i> Plantation Name</th>
+                    <th style="padding: 16px; font-weight: 500; border: none;"><i class="bi bi-geo-alt"></i> Location</th>
+                    <th style="padding: 16px; font-weight: 500; border: none;"><i class="bi bi-person"></i> Assigned To</th>
+                    <th style="padding: 16px; font-weight: 500; border: none; width: 130px;"><i class="bi bi-gear"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in plantations %}
+                <tr style="transition: background 0.2s ease;">
+                    <td style="padding: 16px; vertical-align: middle;">{{ forloop.counter }}</td>
+                    <td style="padding: 16px; vertical-align: middle;">{{ p.plantation_id }}</td>
+                    <td style="padding: 16px; vertical-align: middle;">
+                        <a href="{% url 'plantation_details' p.id %}" style="color: #474bff; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                            {{ p.name }}
+                        </a>
+                    </td>
+                    <td style="padding: 16px; vertical-align: middle;">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ p.latitude }},{{ p.longitude }}" 
+                           target="_blank"
+                           style="color: #474bff; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-geo"></i> View on Map
+                        </a>
+                    </td>
+                    <td style="padding: 16px; vertical-align: middle;">
+                        {% if p.owner %}
+                        <span style="background: #ECFDF5; color: #2ecc71; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-person-check"></i> {{ p.owner.username }}
+                        </span>
+                        {% else %}
+                        <span style="background: #FEF3C7; color: #D97706; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 4px;">
+                            <i class="bi bi-person-x"></i> Unassigned
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 16px; vertical-align: middle;">
+                        <a href="{% url 'assign_plantation' p.id %}" style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; text-decoration: none;">
+                            <i class="bi bi-person-plus"></i> Assign
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

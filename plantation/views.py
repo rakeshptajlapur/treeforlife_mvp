@@ -566,8 +566,11 @@ def add_employee(request):
     except Corporate.DoesNotExist:
         return HttpResponseForbidden("You are not a corporate admin.")
 
+    # Get all employees for the count
+    employees = corporate.employees.all()
+
     # Check credits
-    if corporate.employees.count() >= corporate.employee_credits:
+    if employees.count() >= corporate.employee_credits:
         messages.error(request, "You have reached your employee limit.")
         return redirect('manage_employees')
 
@@ -582,16 +585,19 @@ def add_employee(request):
 
         # Create the user (no password set yet, or set a default)
         user = User.objects.create_user(username=username, email=email)
-        # Optionally set a default password or send an invite email
-        # user.set_password("some-default-password")
-        # user.save()
-
+        
         # Link user to Employee model
         Employee.objects.create(user=user, corporate=corporate)
         messages.success(request, "Employee added successfully!")
         return redirect('manage_employees')
 
-    return render(request, 'corporate/add_employee.html')
+    context = {
+        'corporate': corporate,
+        'employees': employees,  # Added this to context
+        'total_employees': employees.count(),  # Optional: explicit count
+    }
+    
+    return render(request, 'corporate/add_employee.html', context)
 
 
 #for corporate admins to manage plantations list

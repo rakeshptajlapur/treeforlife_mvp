@@ -1,133 +1,71 @@
 {% extends 'plantation/base.html' %}
 {% load static %}
+{% load plantation_filters %}
 
 {% block title %}Corporate Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid" style="overflow-x: hidden;"> <!-- Full-width layout -->
-  <div class="row" style="display: flex; min-height: 70vh;">
-
-    <!-- Sidebar -->
-    <div class="col-md-3"
-         style="
-           background-color: #343a40;
-           color: #fff;
-           padding: 30px;
-           border-radius: 30px;
-           flex-basis: 25%; /* Consistent width */
-           margin-right: 0px !important;
-         ">
-      <h5 style="margin-bottom: 30px;">
-        <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>
-        Corporate Dashboard
-      </h5>
-
-      <ul class="nav flex-column" style="gap: 10px;">
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'corporate_dashboard' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-house-door" style="margin-right: 5px;"></i>
-            Dashboard
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'manage_employees' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-people" style="margin-right: 5px;"></i>
-            Manage Employees
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'manage_plantations' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-tree-fill" style="margin-right: 5px;"></i>
-            Manage Plantations
-          </a>
-        </li>
-      </ul>
+<div class="corporate-dashboard" style="padding: 24px; max-width: 1400px; margin: 0 auto; background: #f8fafc;">
+    <!-- Welcome Header -->
+    <div class="corporate-welcome-card" style="background: white; border-radius: 12px; padding: 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div class="user-info">
+            <h4 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-building"></i> {{ corporate.name }}
+            </h4>
+            <p style="margin: 8px 0 0; color: #64748b;">Welcome back, {{ corporate.admin_user.username }}</p>
+        </div>
+        <div class="date-info" style="background: #f1f5f9; padding: 8px 16px; border-radius: 20px; color: #64748b;">
+            <span><i class="bi bi-calendar3"></i> {% now "F j, Y" %}</span>
+        </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="col-md-6"
-         style="
-           padding: 50px;
-           padding-left: 30px;
-           margin-left: -20px important;
-           background-color: #e1eefa;
-           border-radius: 20px;
-           flex-basis: 70%; /* Adjust width dynamically */
-         ">
-
-      <!-- Welcome Section -->
-      <div class="mb-4">
-        <h2>
-          <i class="bi bi-person-circle" style="margin-right: 8px;"></i>
-          Welcome, {{ corporate.admin_user.username }}!
-        </h2>
-        <h5>Company: <strong>{{ corporate.name }}</strong></h5>
-      </div>
-
-      <!-- Stats Section -->
-      <div class="row" style="flex-wrap: nowrap;"> <!-- Prevent wrapping -->
-        <!-- Employee Credits -->
-        <div class="col-md-3">
-          <div class="card shadow-sm" style="border: none; height: 100%;">
-            <div class="card-body text-left">
-              <i class="bi bi-people display-5 text-primary mb-3"></i>
-              <h6>Employee Credits</h6>
-              <span>Total: <strong>{{ corporate.employee_credits }}</strong></span> |
-              <span>Used: <strong>{{ total_employees }}</strong></span>
-              <div class="mt-2">
-                <a href="{% url 'manage_employees' %}" class="btn btn-primary btn-sm">
-                  <i class="bi bi-people"></i> Employees
-                </a>
-              </div>
+    <!-- Stats Section -->
+    <div class="corporate-stats-section" style="background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div class="row g-4">
+            <!-- Employee Stats -->
+            <div class="col-md-6">
+                <div class="corporate-stat-card employee" style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); border-radius: 12px; padding: 24px; height: 100%; transition: transform 0.2s ease; border: 1px solid rgba(71, 75, 255, 0.1);">
+                    <div class="corporate-stat-icon employee" style="width: 48px; height: 48px; background: rgba(71, 75, 255, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i class="bi bi-people" style="font-size: 1.5rem; color: #474bff;"></i>
+                    </div>
+                    <div class="corporate-stat-content">
+                        <h6 style="color: #64748b; margin-bottom: 12px; font-size: 0.9rem;">Employees</h6>
+                        <div class="corporate-stats-numbers">
+                            <h3 style="font-size: 1.8rem; color: #1e293b; margin-bottom: 4px;">{{ total_employees }}</h3>
+                            <p style="color: #64748b; font-size: 0.9rem;">of {{ corporate.employee_credits }} credits</p>
+                        </div>
+                        <div style="height: 8px; background: rgba(71, 75, 255, 0.1); border-radius: 4px; overflow: hidden; margin: 16px 0;">
+                            <div style="height: 100%; background: linear-gradient(45deg, #474bff, #bc48ff); width: {{ total_employees|percentage:corporate.employee_credits }}%; transition: width 0.3s ease;"></div>
+                        </div>
+                        <a href="{% url 'manage_employees' %}" style="display: inline-flex; align-items: center; gap: 8px; color: #474bff; text-decoration: none; font-size: 0.9rem; margin-top: 16px;">
+                            Manage Employees <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Plantation Credits -->
-        <div class="col-md-3">
-          <div class="card shadow-sm" style="border: none; height: 100%;">
-            <div class="card-body text-left">
-              <i class="bi bi-tree-fill display-5 text-success mb-3"></i>
-              <h6>Plantation Credits</h6>
-              <span>Total: <strong>{{ corporate.plantation_credits }}</strong></span> |
-              <span>Used: <strong>{{ total_plantations }}</strong></span>
-              <div class="mt-2">
-                <a href="{% url 'manage_plantations' %}" class="btn btn-success btn-sm">
-                  <i class="bi bi-tree-fill"></i>  Plantations
-                </a>
-              </div>
+            <!-- Plantation Stats -->
+            <div class="col-md-6">
+                <div class="corporate-stat-card plantation" style="background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border-radius: 12px; padding: 24px; height: 100%; transition: transform 0.2s ease; border: 1px solid rgba(46, 204, 113, 0.1);">
+                    <div class="corporate-stat-icon plantation" style="width: 48px; height: 48px; background: rgba(46, 204, 113, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                        <i class="bi bi-tree" style="font-size: 1.5rem; color: #2ecc71;"></i>
+                    </div>
+                    <div class="corporate-stat-content">
+                        <h6 style="color: #64748b; margin-bottom: 12px; font-size: 0.9rem;">Plantations</h6>
+                        <div class="corporate-stats-numbers">
+                            <h3 style="font-size: 1.8rem; color: #1e293b; margin-bottom: 4px;">{{ total_plantations }}</h3>
+                            <p style="color: #64748b; font-size: 0.9rem;">of {{ corporate.plantation_credits }} credits</p>
+                        </div>
+                        <div style="height: 8px; background: rgba(46, 204, 113, 0.1); border-radius: 4px; overflow: hidden; margin: 16px 0;">
+                            <div style="height: 100%; background: linear-gradient(45deg, #2ecc71, #27ae60); width: {{ total_plantations|percentage:corporate.plantation_credits }}%; transition: width 0.3s ease;"></div>
+                        </div>
+                        <a href="{% url 'manage_plantations' %}" style="display: inline-flex; align-items: center; gap: 8px; color: #2ecc71; text-decoration: none; font-size: 0.9rem; margin-top: 16px;">
+                            Manage Plantations <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="col-md-6">
-          <div class="card shadow-sm" style="border: none; height: 100%;">
-            <div class="card-body text-left">
-              <i class="bi bi-lightning-fill display-5 text-info mb-3"></i>
-              <h5>Quick Actions</h5>
-              <div class="d-flex flex-column gap-2">
-                <a href="{% url 'manage_employees' %}" class="btn btn-outline-primary btn-sm">
-                  <i class="bi bi-people"></i> Manage Employees
-                </a>
-                <a href="{% url 'manage_plantations' %}" class="btn btn-outline-success btn-sm">
-                  <i class="bi bi-tree-fill"></i> Manage Plantations
-                </a>
-                <a href="{% url 'export_employees' %}" class="btn btn-outline-info btn-sm">
-                  <i class="bi bi-download"></i> Export Reports
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 {% endblock %}

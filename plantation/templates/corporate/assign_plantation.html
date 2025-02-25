@@ -4,81 +4,51 @@
 {% block title %}Assign Plantation{% endblock %}
 
 {% block content %}
-<div style="margin: 0 auto; max-width: 1200px;">
-  <div class="row" style="display: flex; flex-wrap: nowrap; min-height:70vh;">
-
-    <!-- Sidebar -->
-    <div class="col-md-3"
-         style="
-           background-color: #343a40; 
-           color: #fff; 
-           padding: 30px;
-           border-radius: 30px;
-         ">
-      <h5 style="margin-bottom: 30px;">
-        <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>
-        Corporate Dashboard
-      </h5>
-
-      <ul class="nav flex-column" style="gap: 10px;">
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'corporate_dashboard' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-house-door" style="margin-right: 5px;"></i>
-            Dashboard
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'manage_employees' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-people" style="margin-right: 5px;"></i>
-            Manage Employees
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white"
-             href="{% url 'manage_plantations' %}"
-             style="padding-left: 0;">
-            <i class="bi bi-tree-fill" style="margin-right: 5px;"></i>
-            Manage Plantations
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Main Content -->
-    <div class="col-md-9"
-         style="
-           padding: 50px; 
-           background-color: #e1eefa; 
-           border-radius: 20px;
-         ">
-      <h2 class="mb-4">
-        <i class="bi bi-arrow-repeat" style="margin-right: 8px;"></i>
-        Assign Plantation: {{ plantation.name }}
-      </h2>
-
-      <form method="POST" style="max-width: 500px;">
-        {% csrf_token %}
-        <div class="mb-3">
-          <label for="employee_id" class="form-label">Choose Employee</label>
-          <select name="employee_id" id="employee_id" class="form-select">
-            {% for emp in employees %}
-            <option value="{{ emp.id }}" {% if emp.user == plantation.owner %}selected{% endif %}>
-              {{ emp.user.username }} | {{ emp.user.email }} | {{ emp.user.plantation_set.count }} plantations
-            </option>
-            {% endfor %}
-          </select>
+<div class="corporate-dashboard" style="padding: 24px; max-width: 1400px; margin: 0 auto; background: #f8fafc;">
+    <!-- Page Header -->
+    <div class="page-header" style="background: white; border-radius: 12px; padding: 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div class="header-content">
+            <h4 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-arrow-repeat"></i> Assign Plantation
+            </h4>
+            <p style="margin: 8px 0 0; color: #64748b;">{{ plantation.name }}</p>
         </div>
-
-        <button type="submit" class="btn btn-primary">
-          <i class="bi bi-check2-circle" style="margin-right: 5px;"></i>
-          Assign
-        </button>
-      </form>
+        <div class="stats-badge" style="display: flex; gap: 12px;">
+            <span style="background: #ECFDF5; color: #2ecc71; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-tree"></i> Plantation ID: {{ plantation.plantation_id }}
+            </span>
+        </div>
     </div>
-  </div>
+
+    <!-- Form Container -->
+    <div class="form-container" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <form method="POST" style="max-width: 500px;">
+            {% csrf_token %}
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; color: #1e293b; font-weight: 500; margin-bottom: 8px;">Choose Employee</label>
+                <select name="employee_id" 
+                        style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background-color: white;">
+                    {% for emp in employees %}
+                    <option value="{{ emp.id }}" {% if emp.user == plantation.owner %}selected{% endif %}
+                            style="padding: 8px;">
+                        {{ emp.user.username }} | {{ emp.user.email }} | {{ emp.user.plantation_set.count }} plantations
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <button type="submit" 
+                        style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s ease;">
+                    <i class="bi bi-check2-circle"></i> Assign
+                </button>
+                
+                <a href="{% url 'manage_plantations' %}" 
+                   style="background: #f1f5f9; color: #64748b; border: none; padding: 12px 24px; border-radius: 8px; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: transform 0.2s ease;">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
