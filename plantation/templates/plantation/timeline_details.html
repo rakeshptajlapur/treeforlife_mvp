@@ -1,88 +1,125 @@
 {% extends 'plantation/base.html' %}
 
-{% block title %}Timeline Details{% endblock %}
+{% block title %}Timeline Details - {{ timeline.activity_title }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-4">
     <div class="row">
-        <!-- Left Section (30%) - Plantation Details -->
-        <div class="col-md-3" style="border-right: 0 solid #ddd; padding-right: 20px;">
-            <div class="card mb-4" style="border-radius: 10px; padding: 20px; background-color: darkslategray;">
-                <div class="card-body" style="color: lightgrey;">
-                    <div class="text-left mb-3">
-                        <!-- Plant Image -->
-                        <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+        <!-- Plantation Info Sidebar -->
+        <div class="col-md-3">
+            <div class="plantation-info-card">
+                <div class="plantation-image">
+                    <a href="{{ plantation.image.url }}" target="_blank" title="View full image">
+                        <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}">
+                    </a>
+                </div>
+                <div class="plantation-details">
+                    <h3>
+                        <a href="{% url 'plantation_details' plantation.id %}" class="plantation-link">
+                            {{ plantation.name|capfirst }}
+                        </a>
+                    </h3>
+                    <div class="info-group">
+                        <i class="bi bi-person-circle"></i>
+                        <a href="{% url 'owner_details' username=plantation.owner.username %}">
+                            {{ plantation.owner.username }}
+                        </a>
                     </div>
-                    <h3 class="text-left">{{ plantation.name }}</h3>
-                    <p><strong>Planted on:</strong> {{ plantation.plantation_date }}</p>
-                    <p><strong>Description:</strong> {{ plantation.description }}</p>
-                    <hr>
-                    <p><strong>Owner-username:</strong> <a href="{% url 'owner_details' username=plantation.owner.username %}" class="text-primary">{{ plantation.owner.username }}</a></p>
                 </div>
             </div>
         </div>
 
-        <!-- Right Section (70%) - Timeline Details -->
-        <div class="col-md-8">
-            <div class="timeline-details-card" style="background-color: white;border:1px solid lightgrey; padding: 20px; border-radius: 5px;">
-                <p>
-                    <strong>Date:</strong> {{ timeline.activity_date }}
-                    <a href="{% url 'plantation_details' plantation.id %}" class="btn btn-link" style="padding-left: 10px;">
-                        <i class="bi bi-arrow-left-circle"></i> Go Back
-                    </a>
-                </p>
-               
-                <div class="d-flex justify-content-between">
-                    <div class="flex-fill me-3">
-                        
-                        {% if timeline.activity_image %}
-                            <a href="{{ timeline.activity_image.url }}" target="_blank">
-                                <img src="{{ timeline.activity_image.url }}" alt="Activity Image" style="max-width: 300px; height: auto; border-radius: 5px; margin-top: 10px;">
-                            </a>
-                        {% endif %}
-                        {% if timeline.video_url %}
-                            <div style="margin-top: 10px;">
-                                <strong>Video:</strong>
-                                <a href="{{ timeline.video_url }}" target="_blank" class="btn btn-primary btn-sm">Watch Video</a>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="flex-fill">
+        <!-- Timeline Content -->
+        <div class="col-md-9">
+            <div class="timeline-detail-card">
+                <!-- Header -->
+                <div class="timeline-header">
+                    <div class="d-flex justify-content-between align-items-center">
                         <h4>{{ timeline.activity_title }}</h4>
-                        <p><strong>Description:</strong> {{ timeline.description }}</p>
+                        <a href="{% url 'plantation_details' plantation.id %}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to Timeline
+                        </a>
+                    </div>
+                    <span class="timeline-date">
+                        <i class="bi bi-calendar-event"></i> {{ timeline.activity_date|date:"F j, Y" }}
+                    </span>
+                </div>
+
+                <!-- Content -->
+                <div class="timeline-content">
+                    <!-- Media Section -->
+                    <div class="media-grid">
+                        {% if timeline.activity_image %}
+                        <div class="activity-image">
+                            <a href="{{ timeline.activity_image.url }}" target="_blank">
+                                <img src="{{ timeline.activity_image.url }}" alt="Activity Image">
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        {% if timeline.video_url %}
+                        <div class="video-section">
+                            <h6><i class="bi bi-camera-video"></i> Activity Video</h6>
+                            <a href="{{ timeline.video_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-play-circle"></i> Watch Video
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="description-section">
+                        <h5><i class="bi bi-journal-text"></i> Description</h5>
+                        <p>{{ timeline.description }}</p>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="comments-section">
+                        <h5><i class="bi bi-chat-dots"></i> Comments</h5>
+                        <div class="comments-list">
+                            {% for comment in comments %}
+                            <div class="comment-card">
+                                <div class="comment-header">
+                                    <span class="user">
+                                        <i class="bi bi-person-circle"></i> {{ comment.user.username }}
+                                    </span>
+                                    <span class="date">{{ comment.created_at|date:"M j, Y g:i A" }}</span>
+                                </div>
+                                <p class="comment-text">{{ comment.text }}</p>
+                            </div>
+                            {% empty %}
+                            <div class="empty-state">
+                                <i class="bi bi-chat"></i>
+                                <p>No comments yet</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Comment Form -->
+                        {% if can_add_comment %}
+                        <div class="comment-form">
+                            <form method="post" action="{% url 'add_comment' plantation_id=plantation.id timeline_id=timeline.id %}">
+                                {% csrf_token %}
+                                <div class="form-floating mb-3">
+                                    <textarea name="text" class="form-control" placeholder="Add a comment" 
+                                              id="commentText" style="height: 100px"></textarea>
+                                    <label for="commentText"><i class="bi bi-pencil"></i> Add your comment</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> Submit Comment
+                                </button>
+                            </form>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            Only the plantation owner can add comments.
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
-
-                <hr class="my-4">
-
-                <h4>Comments</h4>
-                <div class="comments-section" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; border-radius: 10px; background-color: #f9f9f9;">
-                    {% for comment in comments %}
-                        <div class="comment-card" style="margin-bottom: 15px; border-left: 4px solid #007bff; padding-left: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                            <strong>{{ comment.user.username }}:</strong>
-                            <p>{{ comment.text }}</p>
-                            <small class="text-muted">{{ comment.created_at }}</small>
-                        </div>
-                    {% endfor %}
-                </div>
-
-                <hr class="my-4">
-
-                <!-- Add Comment Form -->
-                {% if can_add_comment %}
-                    <form method="post" action="{% url 'add_comment' plantation_id=plantation.id timeline_id=timeline.id %}">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <textarea name="text" class="form-control" placeholder="Add a comment" rows="3" style="border-radius: 8px;"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="border-radius: 8px; margin-top: 10px;">Submit</button>
-                    </form>
-                {% else %}
-                    <p class="alert alert-warning mt-3">You are not authorized to add comments.</p>
-                {% endif %}
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

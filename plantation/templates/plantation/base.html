@@ -26,8 +26,11 @@
     <div class="app-layout">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="{% static 'css/images/treeforlifelogo.png' %}" alt="TreeForLife" class="sidebar-logo">
-                <h1 class="sidebar-title">TreeForLife.net Portal</h1>
+                <a href="{% url 'homepage' %}" class="logo-link">
+                    <img src="{% static 'css/images/treeforlifelogo.png' %}" alt="Logo" class="logo-img">
+                    
+                </a>
+                <p style="text-align: left;">TreeForLife.Net Web Portal</p>
             </div>
 
             <nav class="sidebar-nav">
@@ -56,6 +59,17 @@
 
             <div class="sidebar-footer">
                 {% if user.is_authenticated %}
+                    <div class="support-info">
+                        <h6 class="support-title">For Support:</h6>
+                        <div class="support-item">
+                            <i class="bi bi-telephone"></i>
+                            <a href="tel:+1234567890">+1 (234) 567-890</a>
+                        </div>
+                        <div class="support-item">
+                            <i class="bi bi-envelope"></i>
+                            <a href="mailto:support@treeforlife.com">support@treeforlife.com</a>
+                        </div>
+                    </div>
                     <a href="{% url 'logout' %}" class="btn btn-outline">
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
