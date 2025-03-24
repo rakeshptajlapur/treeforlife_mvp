@@ -8,6 +8,8 @@ from .models import VisitRequest, Timeline, Comment
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.models import User
+from .models import Plantation, Corporate, Employee
 
 def send_email_async(subject, message, recipient_list):
     Thread(
@@ -129,4 +131,150 @@ Best Regards,
 TreeForLife Team
             """
             send_email_async(subject, message, [plantation.owner.email])
+
+# 1. User Creation Notification
+@receiver(post_save, sender=User)
+def notify_new_user_creation(sender, instance, created, **kwargs):
+    """Send welcome email with password reset link to new users"""
+    if created and instance.email:
+        token = default_token_generator.make_token(instance)
+        uid = urlsafe_base64_encode(force_bytes(instance.pk))
+        reset_url = f"{settings.SITE_URL}/reset/{uid}/{token}/"
+        
+        subject = "Welcome to TreeForLife - Account Created"
+        message = f"""
+Dear {instance.username},
+
+Welcome to TreeForLife! Your account has been created successfully.
+
+Username: {instance.username}
+Email: {instance.email}
+
+Please set your password using this link:
+{reset_url}
+
+Best Regards,
+TreeForLife Team
+        """
+        send_email_async(subject, message, [instance.email])
+
+# 2. Plantation Assignment Notification
+@receiver(pre_save, sender=Plantation)
+def notify_plantation_assignment(sender, instance, **kwargs):
+    """Notify user when assigned to a plantation"""
+    try:
+        old_instance = Plantation.objects.get(pk=instance.pk)
+        if old_instance.owner != instance.owner and instance.owner:
+            subject = f"New Plantation Assigned - {instance.name}"
+            message = f"""
+Dear {instance.owner.username},
+
+You have been assigned as the owner of:
+
+Plantation Details:
+- Name: {instance.name}
+- ID: {instance.plantation_id()}
+- Location: {instance.state}
+
+You can view your plantation details at:
+{settings.SITE_URL}/plantation-details/{instance.id}/
+
+Best Regards,
+TreeForLife Team
+            """
+            send_email_async(subject, message, [instance.owner.email])
+    except Plantation.DoesNotExist:
+        pass
+
+# 3. Employee Creation Notification
+@receiver(post_save, sender=Employee)
+def notify_new_employee(sender, instance, created, **kwargs):
+    """Send welcome email to new employees"""
+    if created and instance.user.email:
+        token = default_token_generator.make_token(instance.user)
+        uid = urlsafe_base64_encode(force_bytes(instance.user.pk))
+        reset_url = f"{settings.SITE_URL}/reset/{uid}/{token}/"
+        
+        subject = f"Welcome to {instance.corporate.name} - TreeForLife Employee Portal"
+        message = f"""
+Dear {instance.user.username},
+
+Welcome to TreeForLife! You've been added as an employee of {instance.corporate.name}.
+
+Your Account Details:
+Username: {instance.user.username}
+Email: {instance.user.email}
+
+Set your password here:
+{reset_url}
+
+Corporate Details:
+Company: {instance.corporate.name}
+Admin: {instance.corporate.admin_user.get_full_name() or instance.corporate.admin_user.username}
+
+Best Regards,
+TreeForLife Team
+        """
+        send_email_async(subject, message, [instance.user.email])
+
+# 4. Corporate Account Creation
+@receiver(post_save, sender=Corporate)
+def notify_corporate_creation(sender, instance, created, **kwargs):
+    """Notify when corporate account is created"""
+    if created and instance.admin_user.email:
+        subject = "Corporate Account Created - TreeForLife"
+        message = f"""
+Dear {instance.admin_user.get_full_name() or instance.admin_user.username},
+
+Your corporate account has been created successfully.
+
+Corporate Details:
+- Company Name: {instance.name}
+- Plantation Credits: {instance.plantation_credits}
+- Employee Credits: {instance.employee_credits}
+
+Access your dashboard at:
+{settings.SITE_URL}/corporate/dashboard/
+
+Best Regards,
+TreeForLife Team
+        """
+        send_email_async(subject, message, [instance.admin_user.email])
+
+# Add this new signal after your other signals
+@receiver(pre_save, sender=Corporate)
+def notify_corporate_credits_update(sender, instance, **kwargs):
+    """Notify corporate admin when credits are updated"""
+    try:
+        old_instance = Corporate.objects.get(pk=instance.pk)
+        credits_changed = (
+            old_instance.plantation_credits != instance.plantation_credits or 
+            old_instance.employee_credits != instance.employee_credits
+        )
+        
+        if credits_changed and instance.admin_user.email:
+            subject = f"Credits Updated - {instance.name}"
+            message = f"""
+Dear {instance.admin_user.get_full_name() or instance.admin_user.username},
+
+Your corporate account credits have been updated by TreeForLife Admin:
+
+Previous Credits:
+- Plantation Credits: {old_instance.plantation_credits}
+- Employee Credits: {old_instance.employee_credits}
+
+Updated Credits:
+- Plantation Credits: {instance.plantation_credits}
+- Employee Credits: {instance.employee_credits}
+
+You can manage your resources at:
+{settings.SITE_URL}/corporate/dashboard/
+
+Best Regards,
+TreeForLife Team
+            """
+            send_email_async(subject, message, [instance.admin_user.email])
             
+    except Corporate.DoesNotExist:
+        pass  # Skip for new corporate creation as it's handled by other signal
+

@@ -172,3 +172,7 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "contact@treeforlife.net")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# Site URL Configuration
+SITE_URL = 'http://127.0.0.1:8080'  # For development
+# SITE_URL = 'https://app.treeforlife.net'  # For production when you deploy
+
