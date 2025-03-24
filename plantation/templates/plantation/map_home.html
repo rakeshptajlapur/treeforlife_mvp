@@ -61,10 +61,20 @@
                 <span>↺</span> Reset Filter & Map
             </button>
 
-
-            <a href="{% url 'login' %}" class="login-button">
-                Login to Portal →
-            </a>
+            {% if user.is_authenticated %}
+                <div class="auth-buttons">
+                    <a href="{% url 'owner_details' username=user.username %}" class="dashboard-button">
+                        My Dashboard →
+                    </a>
+                    <a href="{% url 'logout' %}" class="logout-button">
+                        Logout <i class="bi bi-box-arrow-right"></i>
+                    </a>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-button">
+                    Login to Portal →
+                </a>
+            {% endif %}
             
         
             <div class="footer">
