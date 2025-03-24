@@ -66,9 +66,43 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('timeline', 'user')
 
 
-@admin.register(VisitRequest)
+"""@admin.register(VisitRequest)
 class VisitRequestAdmin(admin.ModelAdmin):
     list_display = ('owner', 'plantation', 'check_in_date', 'check_out_date', 'visitors', 'status', 'created_at')
     list_filter = ('status', 'check_in_date')
     search_fields = ('owner__username', 'plantation__name', 'phone_number')
-    list_editable = ('status',)  # ✅ Allow quick approval/rejection in admin
+    list_editable = ('status',)  # ✅ Allow quick approval/rejection in admin"""
+
+
+
+@admin.register(VisitRequest)
+class VisitRequestAdmin(admin.ModelAdmin):
+    list_display = ['plantation', 'owner', 'check_in_date', 'check_out_date', 'visitors', 'status']
+    list_filter = ['status', 'check_in_date']
+    search_fields = ['plantation__name', 'owner__username']
+    
+    # Define base readonly fields
+    readonly_fields = ['created_at', 'status_updated_at', 'plantation', 'owner', 
+                      'phone_number', 'check_in_date', 'check_out_date', 'visitors']
+    
+    fieldsets = (
+        ('Visit Details', {
+            'fields': (
+                'plantation', 'owner', 'phone_number',
+                'check_in_date', 'check_out_date', 'visitors', 'message'
+            )
+        }),
+        ('Status Management', {
+            'fields': (
+                'status', 'admin_comment', 'status_updated_at'
+            ),
+            'description': 'Update visit request status and add comments for the plantation owner.'
+        })
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        # If creating new object, only basic fields are readonly
+        if obj is None:
+            return ['created_at', 'status_updated_at']
+        # If editing existing object, all fields except status and admin_comment are readonly
+        return self.readonly_fields

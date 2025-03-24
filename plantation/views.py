@@ -383,20 +383,38 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            print(f"Login successful for user: {user.username}")  # Debug log
             
             # Check if this user is a corporate admin
             try:
-                # If this succeeds, the user has a corporate_account
                 user.corporate_account
-                # Redirect to corporate dashboard
                 return redirect('corporate_dashboard')
             except Corporate.DoesNotExist:
-                # If we land here, user is not a corporate admin
                 return redirect('owner_details', username=user.username)
+        else:
+            # Try email login if username login failed
+            email = request.POST.get('username')  # Form field is named 'username'
+            password = request.POST.get('password')
+            try:
+                user = User.objects.get(email=email)
+                user = authenticate(request, username=user.username, password=password)
+                if user is not None:
+                    login(request, user)
+                    print(f"Login successful via email for user: {user.username}")  # Debug log
+                    
+                    # Check if corporate admin
+                    try:
+                        user.corporate_account
+                        return redirect('corporate_dashboard')
+                    except Corporate.DoesNotExist:
+                        return redirect('owner_details', username=user.username)
+            except User.DoesNotExist:
+                pass
+            
+            messages.error(request, 'Invalid username/email or password.')
     else:
         form = AuthenticationForm()
 
-    # For breadcrumbs or extra context:
     breadcrumbs = [
         {'name': 'Home', 'url': reverse('homepage')},
         {'name': 'Login', 'url': None}
