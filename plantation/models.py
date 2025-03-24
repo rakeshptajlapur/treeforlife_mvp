@@ -147,7 +147,18 @@ class VisitRequest(models.Model):
     visitors = models.PositiveIntegerField()
     message = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="Pending")  # ✅ Status Field
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="Pending")
+    
+    # New fields
+    admin_comment = models.TextField(blank=True, null=True, verbose_name="Admin Comment")
+    status_updated_at = models.DateTimeField(auto_now=True)
+    status_updated_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL,
+        null=True, 
+        blank=True,
+        related_name='visit_status_updates'
+    )
 
     def __str__(self):
         return f"Visit Request by {self.owner.username} for {self.plantation.name} ({self.status})"
