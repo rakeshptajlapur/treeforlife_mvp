@@ -39,13 +39,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const matches = plantationData.filter(p => 
             p.name.toLowerCase().includes(searchTerm) ||
             p.state.toLowerCase().includes(searchTerm) ||
-            p.owner.toLowerCase().includes(searchTerm)
+            p.owner.toLowerCase().includes(searchTerm) ||
+            (p.plantation_id && p.plantation_id.toString().toLowerCase().includes(searchTerm))  // Add plantation_id search
         );
 
         if (matches.length > 0) {
             suggestionsContainer.innerHTML = matches.map(p => `
                 <div class="suggestion-item" data-lat="${p.latitude}" data-lng="${p.longitude}">
-                    <strong>${p.name}</strong><br>
+                    <strong>${p.plantation_id}</strong> - ${p.name}<br>
                     <small>${p.state} | ${p.owner}</small>
                 </div>
             `).join('');

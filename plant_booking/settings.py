@@ -92,10 +92,15 @@ WSGI_APPLICATION = 'plant_booking.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'treeforlife',
+        'USER': 'postgres',
+        'PASSWORD': 'tksaibaba10145',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
@@ -171,6 +176,9 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "contact@treeforlife.net")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Add this line instead
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Site URL Configuration
 SITE_URL = 'http://127.0.0.1:8080'  # For development
