@@ -4,9 +4,24 @@ from django.contrib.auth.models import User
 from import_export.admin import ImportExportMixin
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
+from django.contrib.admin import SimpleListFilter
 from .resources import UserResource, PlantationResource
 from .models import Corporate, Employee, Plantation, Timeline, Comment, VisitRequest
 
+
+# Add this custom filter class
+class PlantationIDFilter(SimpleListFilter):
+    title = 'Plantation ID'
+    parameter_name = 'plantation_id_filter'
+
+    def lookups(self, request, model_admin):
+        plantations = Plantation.objects.all()
+        return [(p.id, p.plantation_id()) for p in plantations]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(plantation_id=self.value())
+        return queryset
 
 
 # Unregister the default UserAdmin before defining your custom admin
@@ -61,36 +76,42 @@ class PlantationAdmin(ImportExportMixin, admin.ModelAdmin):
 
 @admin.register(Timeline)
 class TimelineAdmin(admin.ModelAdmin):
-    list_display = ('plantation', 'activity_date', 'activity_title', 'description')
-    list_filter = ('plantation', 'activity_date')
-    search_fields = ('activity_title', 'description',)
+    list_display = ('get_plantation_id', 'plantation', 'activity_date', 'activity_title', 'description')
+    list_filter = (PlantationIDFilter, 'activity_date')  # Replace 'plantation' with PlantationIDFilter
+    search_fields = ('activity_title', 'description', 'plantation__name')
     fields = ('plantation', 'activity_date', 'activity_title', 'description', 'activity_image', 'video_url')
+
+    def get_plantation_id(self, obj):
+        return obj.plantation.plantation_id()
+    get_plantation_id.short_description = 'Plantation ID'
+    get_plantation_id.admin_order_field = 'plantation__id'  # Enable sorting
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('timeline', 'user', 'created_at', 'text')
-    search_fields = ('text',)
-    list_filter = ('timeline', 'user')
+    list_display = ('get_plantation_id','timeline', 'user', 'created_at', 'text')
+    search_fields = ('text','timeline__plantation__name')
+    list_filter = (PlantationIDFilter, 'timeline', 'user')
 
-
-"""@admin.register(VisitRequest)
-class VisitRequestAdmin(admin.ModelAdmin):
-    list_display = ('owner', 'plantation', 'check_in_date', 'check_out_date', 'visitors', 'status', 'created_at')
-    list_filter = ('status', 'check_in_date')
-    search_fields = ('owner__username', 'plantation__name', 'phone_number')
-    list_editable = ('status',)  # ✅ Allow quick approval/rejection in admin"""
-
+    def get_plantation_id(self, obj):
+        return obj.timeline.plantation.plantation_id()
+    get_plantation_id.short_description = 'Plantation ID'
+    get_plantation_id.admin_order_field = 'timeline__plantation__id'  # Enable sorting
 
 
 @admin.register(VisitRequest)
 class VisitRequestAdmin(admin.ModelAdmin):
-    list_display = ['plantation', 'owner', 'check_in_date', 'check_out_date', 'visitors', 'status']
-    list_filter = ['status', 'check_in_date']
+    list_display = ['get_plantation_id', 'plantation', 'owner', 'check_in_date', 'check_out_date', 'visitors', 'status']
+    list_filter = [PlantationIDFilter, 'status', 'check_in_date']  # Add PlantationIDFilter here
     search_fields = ['plantation__name', 'owner__username']
     
     # Define base readonly fields
     readonly_fields = ['created_at', 'status_updated_at', 'plantation', 'owner', 
                       'phone_number', 'check_in_date', 'check_out_date', 'visitors']
+    
+    def get_plantation_id(self, obj):
+        return obj.plantation.plantation_id()
+    get_plantation_id.short_description = 'Plantation ID'
+    get_plantation_id.admin_order_field = 'plantation__id'  # Enable sorting
     
     fieldsets = (
         ('Visit Details', {
