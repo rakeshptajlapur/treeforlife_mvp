@@ -48,9 +48,16 @@ class PlantationAdminForm(ModelForm):
 @admin.register(Plantation)
 class PlantationAdmin(ImportExportMixin, admin.ModelAdmin):
     form = PlantationAdminForm
-    list_display = ('name', 'owner', 'corporate', 'created_at', 'updated_at', 'latitude', 'longitude', 'state')
+    list_display = ('plantation_id', 'name', 'owner', 'corporate', 'created_at', 'updated_at', 'latitude', 'longitude', 'state')
     search_fields = ('name', 'owner__username', 'owner__email', 'corporate__name', 'state')
+    list_filter = ('state', 'corporate', 'created_at')
+    ordering = ('-created_at',)
     resource_class = PlantationResource
+
+    def plantation_id(self, obj):
+        return obj.plantation_id()
+    plantation_id.short_description = 'Plantation ID'
+    plantation_id.admin_order_field = 'id'  # Allows sorting by ID
 
 @admin.register(Timeline)
 class TimelineAdmin(admin.ModelAdmin):

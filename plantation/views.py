@@ -669,47 +669,9 @@ def assign_plantation(request, plantation_id):
     }
     return render(request, 'corporate/assign_plantation.html', context)
 
+
+
 def map_home(request):
-    # Get statistics
-    stats = {
-        'states_count': Plantation.objects.values('state').distinct().count(),
-        'plantations_count': Plantation.objects.count(),
-        'owners_count': User.objects.filter(
-            Q(plantation__isnull=False) | 
-            Q(corporate_account__isnull=False)
-        ).exclude(is_superuser=True).distinct().count(),
-        'companies_count': Corporate.objects.count()
-    }
-
-    # Get plantations with coordinates
-    plantations = Plantation.objects.select_related('owner', 'corporate').filter(
-        latitude__isnull=False, 
-        longitude__isnull=False
-    )
-    
-    # Serialize plantation data
-    plantation_data = json.dumps([{
-        'id': p.id,
-        'plantation_id': p.plantation_id(),
-        'name': p.name,
-        'latitude': float(p.latitude),
-        'longitude': float(p.longitude),
-        'state': p.state,
-        'owner': p.owner.username if p.owner else 'Unassigned',
-        'company': p.corporate.name if p.corporate else None
-    } for p in plantations], cls=DjangoJSONEncoder)
-
-    # Add auth context
-    context = {
-        'stats': stats,
-        'plantation_data': plantation_data,
-        # user is automatically available in template context
-        # through django.contrib.auth.context_processors.auth
-    }
-
-    return render(request, 'plantation/map_home.html', context)
-
-"""def map_home(request):
     # Get statistics
     stats = {
         'states_count': Plantation.objects.values('state').distinct().count(),
@@ -742,4 +704,4 @@ def map_home(request):
     return render(request, 'plantation/map_home.html', {
         'stats': stats,
         'plantation_data': plantation_data
-    })"""
+    })
