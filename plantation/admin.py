@@ -93,17 +93,73 @@ class PlantationAdmin(ImportExportMixin, admin.ModelAdmin):
     plantation_id.short_description = 'Plantation ID'
     plantation_id.admin_order_field = 'id'
 
+# Add after PlantationAdminForm
+class TimelineAdminForm(ModelForm):
+    class Meta:
+        model = Timeline
+        fields = '__all__'
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Customize plantation field label and choices
+        if 'plantation' in self.fields:
+            self.fields['plantation'].label = "Plantation (ID - Name)"
+            plantations = Plantation.objects.all()
+            self.fields['plantation'].choices = [
+                (p.id, f"{p.plantation_id()} - {p.name}") 
+                for p in plantations
+            ]
+
 @admin.register(Timeline)
 class TimelineAdmin(admin.ModelAdmin):
+    form = TimelineAdminForm
     list_display = ('get_plantation_id', 'plantation', 'activity_date', 'activity_title', 'description')
-    list_filter = (PlantationIDFilter, 'activity_date')  # Replace 'plantation' with PlantationIDFilter
+    list_filter = (PlantationIDFilter, 'activity_date')
     search_fields = ('activity_title', 'description', 'plantation__name')
-    fields = ('plantation', 'activity_date', 'activity_title', 'description', 'activity_image', 'video_url')
+    
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # If editing existing timeline
+            return ('plantation', 'display_plantation_id')
+        return ()
+
+    def get_fieldsets(self, request, obj=None):
+        if obj:  # If editing existing timeline
+            fieldsets = (
+                ('Plantation Information', {
+                    'fields': ('display_plantation_id', 'plantation'),
+                    'description': 'Plantation information cannot be changed after creation.'
+                }),
+            )
+        else:  # If creating new timeline
+            fieldsets = (
+                ('Plantation Information', {
+                    'fields': ('plantation',),
+                    'description': 'Select plantation by ID. Once created, plantation cannot be changed.'
+                }),
+            )
+        
+        fieldsets += (
+            ('Timeline Details', {
+                'fields': ('activity_date', 'activity_title', 'description')
+            }),
+            ('Media', {
+                'fields': ('activity_image', 'video_url')
+            }),
+        )
+        return fieldsets
+
+    def display_plantation_id(self, obj):
+        if obj and obj.plantation:
+            return f"Plantation ID: {obj.plantation.plantation_id()}"
+        return "-"
+    display_plantation_id.short_description = "Plantation ID"
 
     def get_plantation_id(self, obj):
-        return obj.plantation.plantation_id()
+        if obj and obj.plantation:
+            return obj.plantation.plantation_id()
+        return "-"
     get_plantation_id.short_description = 'Plantation ID'
-    get_plantation_id.admin_order_field = 'plantation__id'  # Enable sorting
+    get_plantation_id.admin_order_field = 'plantation__id'
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
