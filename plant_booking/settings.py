@@ -92,15 +92,17 @@ WSGI_APPLICATION = 'plant_booking.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'treeforlife',
-        'USER': 'postgres',
-        'PASSWORD': 'tksaibaba10145',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'treeforlife',  # Changed from 'Local instance MySQL80'
+        'USER': 'root',
+        'PASSWORD': 'tksaibaba10145###',
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
-
 
 
 # Password validation
@@ -167,18 +169,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ADMIN_EMAIL = "contact@treeforlife.net"
 
 # SMTP Email Settings (Make sure you replace with actual details)
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.hostinger.com")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", 465))
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "contact@treeforlife.net")
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+#EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.hostinger.com")
+#EMAIL_PORT = int(os.getenv("EMAIL_PORT", 465))
+#EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
+#EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
+#EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+#EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+#ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "contact@treeforlife.net")
+#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Add this line instead
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Site URL Configuration
 SITE_URL = 'http://127.0.0.1:8080'  # For development
