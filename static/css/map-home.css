@@ -69,12 +69,25 @@
 }
 
 .suggestion-item {
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    padding: 8px;
     cursor: pointer;
 }
 
+.plantation-id {
+    font-weight: bold;
+    color: #2c5282;
+    margin-right: 12px;
+    min-width: 70px;
+}
+
+.plantation-details {
+    flex: 1;
+}
+
 .suggestion-item:hover {
-    background: var(--bg-color);
+    background-color: #f7fafc;
 }
 
 .stats-grid {
@@ -149,11 +162,44 @@
 .marker-tooltip {
     text-transform: capitalize;
     font-family: 'Poppins', sans-serif;
-    padding: 15px;
+    padding: 12px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     text-align: left;
-    min-width: 250px;
+    min-width: 200px;
+}
+
+.tooltip-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+}
+
+.tooltip-content {
+    width: 100%;
+}
+
+.tooltip-plantation-id {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.tooltip-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.tooltip-details {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.tooltip-details p {
+    margin: 2px 0;
 }
 
 .marker-tooltip h4 {
