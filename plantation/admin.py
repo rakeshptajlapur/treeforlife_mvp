@@ -1,13 +1,13 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from import_export.admin import ImportExportMixin
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.contrib.admin import SimpleListFilter
 from .resources import UserResource, PlantationResource
 from .models import Corporate, Employee, Plantation, Timeline, Comment, VisitRequest
-
 
 # Add this custom filter class
 class PlantationIDFilter(SimpleListFilter):
@@ -24,17 +24,28 @@ class PlantationIDFilter(SimpleListFilter):
         return queryset
 
 
-# Unregister the default UserAdmin before defining your custom admin
+# Custom User Creation Form with Email
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name')
+
+# Unregister the default UserAdmin
 admin.site.unregister(User)
 
-# Extend the default UserAdmin with ImportExportMixin
-class CustomUserAdmin(ImportExportMixin, DefaultUserAdmin):
-    resource_class = UserResource
-    list_display = ('username', 'email', 'is_staff', 'is_active', 'date_joined')
-    search_fields = ('username', 'email')
-
-# Register your custom UserAdmin
-admin.site.register(User, CustomUserAdmin)
+# Custom User Admin
+@admin.register(User)
+class CustomUserAdmin(ImportExportMixin, BaseUserAdmin):
+    add_form = CustomUserCreationForm
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2'),
+        }),
+    )
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+    search_fields = ('username', 'first_name', 'last_name', 'email')
+    ordering = ('-date_joined',)
 
 @admin.register(Corporate)
 class CorporateAdmin(admin.ModelAdmin):
