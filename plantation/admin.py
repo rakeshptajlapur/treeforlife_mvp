@@ -176,36 +176,49 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(VisitRequest)
 class VisitRequestAdmin(admin.ModelAdmin):
     list_display = ['get_plantation_id', 'plantation', 'owner', 'check_in_date', 'check_out_date', 'visitors', 'status']
-    list_filter = [PlantationIDFilter, 'status', 'check_in_date']  # Add PlantationIDFilter here
+    list_filter = [PlantationIDFilter, 'status', 'check_in_date']
     search_fields = ['plantation__name', 'owner__username']
     
     # Define base readonly fields
     readonly_fields = ['created_at', 'status_updated_at', 'plantation', 'owner', 
-                      'phone_number', 'check_in_date', 'check_out_date', 'visitors']
+                      'phone_number', 'check_in_date', 'check_out_date', 'visitors',
+                      'display_plantation_id']  # Add display_plantation_id
     
     def get_plantation_id(self, obj):
         return obj.plantation.plantation_id()
     get_plantation_id.short_description = 'Plantation ID'
-    get_plantation_id.admin_order_field = 'plantation__id'  # Enable sorting
+    get_plantation_id.admin_order_field = 'plantation__id'
+    
+    def display_plantation_id(self, obj):
+        if obj and obj.plantation:
+            return f"Plantation ID: {obj.plantation.plantation_id()}"
+        return "-"
+    display_plantation_id.short_description = "Plantation ID"
     
     fieldsets = (
         ('Visit Details', {
             'fields': (
-                'plantation', 'owner', 'phone_number',
-                'check_in_date', 'check_out_date', 'visitors', 'message'
+                'display_plantation_id',  # Add at the top
+                'plantation', 
+                'owner', 
+                'phone_number',
+                'check_in_date', 
+                'check_out_date', 
+                'visitors', 
+                'message'
             )
         }),
         ('Status Management', {
             'fields': (
-                'status', 'admin_comment', 'status_updated_at'
+                'status', 
+                'admin_comment', 
+                'status_updated_at'
             ),
             'description': 'Update visit request status and add comments for the plantation owner.'
         })
     )
 
     def get_readonly_fields(self, request, obj=None):
-        # If creating new object, only basic fields are readonly
         if obj is None:
             return ['created_at', 'status_updated_at']
-        # If editing existing object, all fields except status and admin_comment are readonly
         return self.readonly_fields
