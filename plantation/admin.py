@@ -48,6 +48,10 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 # Custom form for PlantationAdmin to enforce validation
 class PlantationAdminForm(ModelForm):
+    class Meta:
+        model = Plantation
+        fields = '__all__'
+
     def clean(self):
         cleaned_data = super().clean()
         corporate = cleaned_data.get('corporate')
@@ -68,11 +72,26 @@ class PlantationAdmin(ImportExportMixin, admin.ModelAdmin):
     list_filter = ('state', 'corporate', 'created_at')
     ordering = ('-created_at',)
     resource_class = PlantationResource
+    readonly_fields = ('plantation_id', 'created_at', 'updated_at')
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('plantation_id', 'name', 'owner', 'corporate', 'plantation_date', 'description')
+        }),
+        ('Location Details', {
+            'fields': ('latitude', 'longitude', 'state')
+        }),
+        ('Media', {
+            'fields': ('image',)
+        })
+    )
 
     def plantation_id(self, obj):
-        return obj.plantation_id()
+        if obj and obj.pk:
+            return obj.plantation_id()
+        return "Will be generated after saving"
     plantation_id.short_description = 'Plantation ID'
-    plantation_id.admin_order_field = 'id'  # Allows sorting by ID
+    plantation_id.admin_order_field = 'id'
 
 @admin.register(Timeline)
 class TimelineAdmin(admin.ModelAdmin):
