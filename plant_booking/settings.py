@@ -27,9 +27,13 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['rakeshptajlapur.pythonanywhere.com', '127.0.0.1', 'localhost', 'app.treeforlife.net']
+# Handle allowed hosts based on environment
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+else:
+    ALLOWED_HOSTS = ['rakeshptajlapur.pythonanywhere.com', 'app.treeforlife.net']
 
 
 # Application definition
