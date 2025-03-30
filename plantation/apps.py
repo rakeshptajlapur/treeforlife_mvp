@@ -6,4 +6,12 @@ class PlantationConfig(AppConfig):
     name = 'plantation'
 
     def ready(self):
-        import plantation.signals
+        from . import signals
+        print("\n✓ TreeForLife Signals Initialized:")
+        print("  ├── VisitRequest status change")
+        print("  ├── Timeline creation")
+        print("  ├── Comment notifications")
+        print("  ├── User creation")
+        print("  ├── Plantation assignment")
+        print("  ├── Employee creation")
+        print("  └── Corporate notifications")

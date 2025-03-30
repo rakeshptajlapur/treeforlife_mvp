@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'plantation',
+    'plantation.apps.PlantationConfig',
     'import_export',
     
     # Third-party apps
