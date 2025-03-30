@@ -161,17 +161,71 @@ class TimelineAdmin(admin.ModelAdmin):
     get_plantation_id.short_description = 'Plantation ID'
     get_plantation_id.admin_order_field = 'plantation__id'
 
+class CommentAdminForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'timeline' in self.fields:
+            # Show both plantation ID and timeline title in dropdown
+            timelines = Timeline.objects.select_related('plantation').all()
+            self.fields['timeline'].choices = [
+                (t.id, f"{t.plantation.plantation_id()} - {t.activity_title}") 
+                for t in timelines
+            ]
+
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('get_plantation_id','timeline', 'user', 'created_at', 'text')
-    search_fields = ('text','timeline__plantation__name')
+    form = CommentAdminForm
+    list_display = ('get_plantation_id', 'timeline', 'user', 'created_at', 'text')
+    search_fields = ('text', 'timeline__plantation__name')
     list_filter = (PlantationIDFilter, 'timeline', 'user')
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # Editing existing comment
+            return ('display_plantation_id', 'timeline', 'user', 'created_at')
+        return ('display_plantation_id', 'created_at')  # New comment
+
+    def get_fieldsets(self, request, obj=None):
+        if obj:  # Editing existing comment
+            return (
+                ('Plantation Information', {
+                    'fields': ('display_plantation_id', 'timeline'),
+                    'description': 'Timeline and plantation information cannot be changed after creation.'
+                }),
+                ('Comment Details', {
+                    'fields': ('user', 'text', 'created_at')
+                })
+            )
+        else:  # Adding new comment
+            return (
+                ('Plantation Information', {
+                    'fields': ('timeline',),
+                    'description': 'Select timeline by Plantation ID and Timeline title. Cannot be changed after creation.'
+                }),
+                ('Comment Details', {
+                    'fields': ('user', 'text')
+                })
+            )
+
+    def display_plantation_id(self, obj):
+        if obj and obj.timeline and obj.timeline.plantation:
+            return f"Plantation ID: {obj.timeline.plantation.plantation_id()}"
+        return "-"
+    display_plantation_id.short_description = "Plantation ID"
 
     def get_plantation_id(self, obj):
         return obj.timeline.plantation.plantation_id()
     get_plantation_id.short_description = 'Plantation ID'
-    get_plantation_id.admin_order_field = 'timeline__plantation__id'  # Enable sorting
+    get_plantation_id.admin_order_field = 'timeline__plantation__id'
 
+    def save_model(self, request, obj, form, change):
+        if not change:  # If creating new comment
+            if not obj.user:  # If user not set
+                obj.user = request.user  # Set current admin as user
+        super().save_model(request, obj, form, change)
 
 @admin.register(VisitRequest)
 class VisitRequestAdmin(admin.ModelAdmin):
