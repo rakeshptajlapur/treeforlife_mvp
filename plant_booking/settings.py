@@ -10,22 +10,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
-load_dotenv()  # Load environment variables from .env file
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Build paths and load environment variables
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Ensure project directory is in Python path
+if str(BASE_DIR) not in sys.path:
+    sys.path.append(str(BASE_DIR))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+load_dotenv(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-x^=&9gnphr-$b1sy5(ouaa56$(zpac3q0=4@)hlo!orvk07^mv'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['rakeshptajlapur.pythonanywhere.com', '127.0.0.1', 'localhost']
 
@@ -93,11 +95,11 @@ WSGI_APPLICATION = 'plant_booking.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'treeforlife',  # Changed from 'Local instance MySQL80'
-        'USER': 'root',
-        'PASSWORD': 'tksaibaba10145###',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
@@ -165,24 +167,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-# Admin Email for Notifications
-ADMIN_EMAIL = "contact@treeforlife.net"
+# Email Configuration
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '465'))
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'True').lower() == 'true'
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False').lower() == 'true'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_TIMEOUT = 30
 
-# SMTP Email Settings (Make sure you replace with actual details)
-#EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-#EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.hostinger.com")
-#EMAIL_PORT = int(os.getenv("EMAIL_PORT", 465))
-#EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "False").lower() == "true"
-#EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
-#EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-#EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-#ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "contact@treeforlife.net")
-#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-# Add this line instead
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ADMIN_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Site URL Configuration
-SITE_URL = 'http://127.0.0.1:8080'  # For development
-# SITE_URL = 'https://app.treeforlife.net'  # For production when you deploy
-
+SITE_URL = 'https://app.treeforlife.net' if not DEBUG else 'http://127.0.0.1:8080'

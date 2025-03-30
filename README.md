@@ -1,4 +1,3 @@
-
 # Plantation Management System
 
 ## Project Overview
@@ -41,7 +40,6 @@ The Plantation Management System is a web application designed to help plantatio
 - **Search and Filter**: The system provides a search filter for users to find plantations by name easily.
 - **Login for Plantation Owners**: Plantation owners are required to log in before accessing their plantation details and managing timelines and comments.
 
-
 ## Installation
 
 1. Clone this repository:
@@ -65,6 +63,13 @@ The Plantation Management System is a web application designed to help plantatio
    ```
 
 5. Open the application in your browser at `http://127.0.0.1:8000/`.
+
+## Environment Setup
+
+1. Copy `.env.example` to `.env`
+2. Update `.env` with your credentials
+3. Never commit `.env` file to version control
+4. Keep production credentials secure
 
 ## Contact
 
