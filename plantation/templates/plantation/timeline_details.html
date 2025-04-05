@@ -4,24 +4,27 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row">
+    <div class="row g-4"> <!-- Added g-4 for gap -->
         <!-- Plantation Info Sidebar -->
         <div class="col-md-3">
-            <div class="plantation-info-card">
-                <div class="plantation-image">
+            <div class="card shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                <div style="position: relative; padding-top: 75%;">
                     <a href="{{ plantation.image.url }}" target="_blank" title="View full image">
-                        <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}">
+                        <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" 
+                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
                     </a>
                 </div>
-                <div class="plantation-details">
-                    <h3>
-                        <a href="{% url 'plantation_details' plantation.id %}" class="plantation-link">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <a href="{% url 'plantation_details' plantation.id %}" 
+                           style="color: #1a1a1a; text-decoration: none; font-weight: 600;">
                             {{ plantation.name|capfirst }}
                         </a>
-                    </h3>
-                    <div class="info-group">
-                        <i class="bi bi-person-circle"></i>
-                        <a href="{% url 'owner_details' username=plantation.owner.username %}">
+                    </h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-person-circle text-primary"></i>
+                        <a href="{% url 'owner_details' username=plantation.owner.username %}" 
+                           style="color: #666; text-decoration: none;">
                             {{ plantation.owner.username }}
                         </a>
                     </div>
@@ -31,65 +34,73 @@
 
         <!-- Timeline Content -->
         <div class="col-md-9">
-            <div class="timeline-detail-card">
+            <div class="card shadow-sm" style="border-radius: 12px; overflow: hidden;">
                 <!-- Header -->
-                <div class="timeline-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4>{{ timeline.activity_title }}</h4>
-                        <a href="{% url 'plantation_details' plantation.id %}" class="btn btn-outline-light btn-sm">
+                <div class="card-header bg-white" style="border-bottom: 1px solid rgba(0,0,0,0.08);">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <h4 class="mb-0">{{ timeline.activity_title }}</h4>
+                        <a href="{% url 'plantation_details' plantation.id %}" 
+                           class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-arrow-left"></i> Back to Timeline
                         </a>
                     </div>
-                    <span class="timeline-date">
-                        <i class="bi bi-calendar-event"></i> {{ timeline.activity_date|date:"F j, Y" }}
-                    </span>
+                    <div class="mt-2 text-muted">
+                        <i class="bi bi-calendar-event"></i> 
+                        {{ timeline.activity_date|date:"F j, Y" }}
+                    </div>
                 </div>
 
-                <!-- Content -->
-                <div class="timeline-content">
+                <div class="card-body">
                     <!-- Media Section -->
-                    <div class="media-grid">
+                    {% if timeline.activity_image or timeline.video_url %}
+                    <div class="row g-4 mb-4">
                         {% if timeline.activity_image %}
-                        <div class="activity-image">
-                            <a href="{{ timeline.activity_image.url }}" target="_blank">
-                                <img src="{{ timeline.activity_image.url }}" alt="Activity Image">
+                        <div class="col-md-8">
+                            <a href="{{ timeline.activity_image.url }}" target="_blank" 
+                               style="display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <img src="{{ timeline.activity_image.url }}" alt="Activity Image" 
+                                     style="width: 100%; height: auto; display: block;">
                             </a>
                         </div>
                         {% endif %}
 
                         {% if timeline.video_url %}
-                        <div class="video-section">
-                            <h6><i class="bi bi-camera-video"></i> Activity Video</h6>
-                            <a href="{{ timeline.video_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-play-circle"></i> Watch Video
-                            </a>
+                        <div class="col-md-4">
+                            <div class="p-3" style="background: #f8f9fa; border-radius: 8px;">
+                                <h6 class="mb-3"><i class="bi bi-camera-video"></i> Activity Video</h6>
+                                <a href="{{ timeline.video_url }}" target="_blank" 
+                                   class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="bi bi-play-circle"></i> Watch Video
+                                </a>
+                            </div>
                         </div>
                         {% endif %}
                     </div>
+                    {% endif %}
 
                     <!-- Description -->
-                    <div class="description-section">
-                        <h5><i class="bi bi-journal-text"></i> Description</h5>
-                        <p>{{ timeline.description }}</p>
+                    <div class="mb-4 pb-4" style="border-bottom: 1px solid rgba(0,0,0,0.08);">
+                        <h5 class="mb-3"><i class="bi bi-journal-text"></i> Description</h5>
+                        <p class="text-muted mb-0">{{ timeline.description }}</p>
                     </div>
 
                     <!-- Comments Section -->
-                    <div class="comments-section">
-                        <h5><i class="bi bi-chat-dots"></i> Comments</h5>
-                        <div class="comments-list">
+                    <div>
+                        <h5 class="mb-4"><i class="bi bi-chat-dots"></i> Comments</h5>
+                        <div class="comments-wrapper" style="max-height: 400px; overflow-y: auto; margin-bottom: 2rem;">
                             {% for comment in comments %}
-                            <div class="comment-card">
-                                <div class="comment-header">
-                                    <span class="user">
+                            <div class="p-3 mb-3" style="background: #f8f9fa; border-radius: 8px; border-left: 3px solid #0d6efd;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-medium">
                                         <i class="bi bi-person-circle"></i> {{ comment.user.username }}
                                     </span>
-                                    <span class="date">{{ comment.created_at|date:"M j, Y g:i A" }}</span>
+                                    <small class="text-muted">{{ comment.created_at|date:"M j, Y g:i A" }}</small>
                                 </div>
-                                <p class="comment-text">{{ comment.text }}</p>
+                                <p class="mb-0">{{ comment.text }}</p>
                             </div>
                             {% empty %}
-                            <div class="empty-state">
-                                <i class="bi bi-chat"></i>
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-chat h3"></i>
                                 <p>No comments yet</p>
                             </div>
                             {% endfor %}
@@ -102,16 +113,18 @@
                                 {% csrf_token %}
                                 <div class="form-floating mb-3">
                                     <textarea name="text" class="form-control" placeholder="Add a comment" 
-                                              id="commentText" style="height: 100px"></textarea>
-                                    <label for="commentText"><i class="bi bi-pencil"></i> Add your comment</label>
+                                              id="commentText" style="height: 100px; border-radius: 8px;"></textarea>
+                                    <label for="commentText">
+                                        <i class="bi bi-pencil"></i> Add your comment
+                                    </label>
                                 </div>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary px-4">
                                     <i class="bi bi-send"></i> Submit Comment
                                 </button>
                             </form>
                         </div>
                         {% else %}
-                        <div class="alert alert-info">
+                        <div class="alert alert-info d-flex align-items-center gap-2">
                             <i class="bi bi-info-circle"></i>
                             Only the plantation owner can add comments.
                         </div>
@@ -122,4 +135,32 @@
         </div>
     </div>
 </div>
+
+<style>
+    @media (max-width: 768px) {
+        .container { padding: 1rem; }
+        .card-header { padding: 1rem; }
+        .card-body { padding: 1rem; }
+        .comment-form textarea { height: 80px !important; }
+        .timeline-date { margin-top: 0.5rem; display: block; }
+    }
+    
+    .comments-wrapper::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .comments-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    .comments-wrapper::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 3px;
+    }
+    
+    .comments-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+</style>
 {% endblock %}
