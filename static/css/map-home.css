@@ -152,8 +152,8 @@
 
 /* Marker and tooltip styles */
 .custom-marker {
-    width: 32px !important;
-    height: 32px !important;
+    width: 20px !important;  /* Reduced from 32px */
+    height: 20px !important; /* Reduced from 32px */
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -223,12 +223,12 @@
 }
 
 .marker-pin {
-    width: 24px;
-    height: 24px;
+    width: 12px;            /* Reduced from 24px */
+    height: 12px;           /* Reduced from 24px */
     background: var(--primary-color);
-    border: 3px solid white;
+    border: 2px solid white;  /* Reduced border width */
     border-radius: 50%;
-    box-shadow: 0 0 4px rgba(0,0,0,0.3);
+    box-shadow: 0 0 4px rgba(71, 81, 1, 0.3);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -240,9 +240,9 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 24px;
-    height: 24px;
-    background: rgba(33, 150, 243, 0.3);
+    width: 16px;            /* Reduced from 24px */
+    height: 16px;           /* Reduced from 24px */
+    background: rgba(107, 81, 8, 0.3);
     border-radius: 50%;
     animation: ripple 1.5s infinite;
 }
