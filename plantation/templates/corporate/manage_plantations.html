@@ -4,33 +4,253 @@
 {% block title %}Manage Plantations{% endblock %}
 
 {% block content %}
-<div class="corporate-dashboard" style="padding: 24px; max-width: 1400px; margin: 0 auto; background: #f8fafc;">
+<style>
+    /* Base styles */
+    .corporate-dashboard {
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+        background: #f8fafc;
+    }
+
+    /* Header Styles */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .header-content h4 {
+        margin: 0;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .header-content p {
+        margin: 8px 0 0;
+        color: #64748b;
+    }
+
+    /* Stats Badge */
+    .stats-badge {
+        display: flex;
+        gap: 12px;
+    }
+
+    .stats-badge span {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Action Bar */
+    .action-bar {
+        background: white;
+        border-radius: 12px;
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Table Styles */
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead {
+        background: linear-gradient(45deg, #474bff, #bc48ff);
+        color: white;
+    }
+
+    .table th {
+        padding: 16px;
+        font-weight: 500;
+        border: none;
+    }
+
+    .table td {
+        padding: 16px;
+        vertical-align: middle;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .status-badge.assigned {
+        background: #ECFDF5;
+        color: #2ecc71;
+    }
+
+    .status-badge.unassigned {
+        background: #FEF3C7;
+        color: #D97706;
+    }
+
+    /* Action Buttons */
+    .btn-export {
+        background: linear-gradient(45deg, #2ecc71, #27ae60);
+        color: white;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+
+    .btn-assign {
+        background: linear-gradient(45deg, #474bff, #bc48ff);
+        color: white;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-assign:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .corporate-dashboard {
+            padding: 12px;
+        }
+
+        .page-header {
+            flex-direction: column;
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .stats-badge {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .stats-badge span {
+            justify-content: center;
+        }
+
+        .action-bar {
+            padding: 16px;
+        }
+
+        .col-md-6.text-end {
+            text-align: center !important;
+            margin-top: 16px;
+        }
+
+        .btn-export {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Table Responsive */
+        .table-container {
+            border-radius: 8px;
+        }
+
+        .table thead {
+            display: none;
+        }
+
+        .table tbody tr {
+            display: block;
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0 !important;
+            border: none !important;
+        }
+
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .table td:last-child {
+            justify-content: center;
+            margin-top: 12px;
+            padding-top: 16px !important;
+            border-top: 1px solid #e5e7eb !important;
+        }
+
+        .btn-assign {
+            width: auto;
+            min-width: 120px;
+            justify-content: center;
+            margin: 0 auto;
+            padding: 8px 16px;
+        }
+    }
+</style>
+
+<div class="corporate-dashboard">
     <!-- Page Header -->
-    <div class="page-header" style="background: white; border-radius: 12px; padding: 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <div class="page-header">
         <div class="header-content">
-            <h4 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+            <h4>
                 <i class="bi bi-tree-fill"></i> Manage Plantations
             </h4>
-            <p style="margin: 8px 0 0; color: #64748b;">Manage your organization's plantations</p>
+            <p>Manage your organization's plantations</p>
         </div>
-        <div class="stats-badge" style="display: flex; gap: 12px;">
-            <span style="background: #EEF2FF; color: #474bff; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+        <div class="stats-badge">
+            <span style="background: #EEF2FF; color: #474bff;">
                 <i class="bi bi-tree"></i> Credits: {{ corporate.plantation_credits }}
             </span>
-            <span style="background: #ECFDF5; color: #2ecc71; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+            <span style="background: #ECFDF5; color: #2ecc71;">
                 <i class="bi bi-tree-fill"></i> Active: {{ plantations.count }}
             </span>
         </div>
     </div>
 
     <!-- Action Bar -->
-    <div class="action-bar" style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <div class="action-bar">
         <div class="row align-items-center">
             <div class="col-md-6">
                 <!-- Left side actions if needed -->
             </div>
             <div class="col-md-6 text-end">
-                <a href="{% url 'export_plantations' %}" class="btn" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;">
+                <a href="{% url 'export_plantations' %}" class="btn-export">
                     <i class="bi bi-download"></i> Export Plantations
                 </a>
             </div>
@@ -38,48 +258,47 @@
     </div>
 
     <!-- Plantations Table -->
-    <div class="table-container" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <table class="table" style="margin-bottom: 0;">
-            <thead style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white;">
+    <div class="table-container">
+        <table class="table">
+            <thead>
                 <tr>
-                    <th style="padding: 16px; font-weight: 500; border: none;">#</th>
-                    <th style="padding: 16px; font-weight: 500; border: none;"><i class="bi bi-hash"></i> Plantation ID</th>
-                    <th style="padding: 16px; font-weight: 500; border: none;"><i class="bi bi-tree"></i> Plantation Name</th>
-                    <th style="padding: 16px; font-weight: 500; border: none;"><i class="bi bi-geo-alt"></i> Location</th>
-                    <th style="padding: 16px; font-weight: 500; border: none;"><i class="bi bi-person"></i> Assigned To</th>
-                    <th style="padding: 16px; font-weight: 500; border: none; width: 130px;"><i class="bi bi-gear"></i> Actions</th>
+                    <th>#</th>
+                    <th><i class="bi bi-hash"></i> Plantation ID</th>
+                    <th><i class="bi bi-tree"></i> Plantation Name</th>
+                    <th><i class="bi bi-geo-alt"></i> Location</th>
+                    <th><i class="bi bi-person"></i> Assigned To</th>
+                    <th><i class="bi bi-gear"></i> Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for p in plantations %}
-                <tr style="transition: background 0.2s ease;">
-                    <td style="padding: 16px; vertical-align: middle;">{{ forloop.counter }}</td>
-                    <td style="padding: 16px; vertical-align: middle;">{{ p.plantation_id }}</td>
-                    <td style="padding: 16px; vertical-align: middle;">
-                        <a href="{% url 'plantation_details' p.id %}" style="color: #474bff; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                <tr>
+                    <td data-label="#">{{ forloop.counter }}</td>
+                    <td data-label="Plantation ID">{{ p.plantation_id }}</td>
+                    <td data-label="Name">
+                        <a href="{% url 'plantation_details' p.id %}" class="text-primary">
                             {{ p.name }}
                         </a>
                     </td>
-                    <td style="padding: 16px; vertical-align: middle;">
+                    <td data-label="Location">
                         <a href="https://www.google.com/maps/search/?api=1&query={{ p.latitude }},{{ p.longitude }}" 
-                           target="_blank"
-                           style="color: #474bff; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                           target="_blank" class="text-primary">
                             <i class="bi bi-geo"></i> View on Map
                         </a>
                     </td>
-                    <td style="padding: 16px; vertical-align: middle;">
+                    <td data-label="Assigned To">
                         {% if p.owner %}
-                        <span style="background: #ECFDF5; color: #2ecc71; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 4px;">
+                        <span class="status-badge assigned">
                             <i class="bi bi-person-check"></i> {{ p.owner.username }}
                         </span>
                         {% else %}
-                        <span style="background: #FEF3C7; color: #D97706; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 4px;">
+                        <span class="status-badge unassigned">
                             <i class="bi bi-person-x"></i> Unassigned
                         </span>
                         {% endif %}
                     </td>
-                    <td style="padding: 16px; vertical-align: middle;">
-                        <a href="{% url 'assign_plantation' p.id %}" style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; text-decoration: none;">
+                    <td data-label="Actions">
+                        <a href="{% url 'assign_plantation' p.id %}" class="btn-assign">
                             <i class="bi bi-person-plus"></i> Assign
                         </a>
                     </td>
