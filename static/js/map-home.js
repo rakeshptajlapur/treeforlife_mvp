@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const suggestionsContainer = document.querySelector('.search-suggestions');
 
     // Update search input placeholder
-    searchInput.placeholder = "Search by Plantation ID (TFL001), Name, or Location";
+    searchInput.placeholder = "Search by Plantation ID (PLT...)";
 
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase().trim();

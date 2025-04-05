@@ -64,11 +64,15 @@
                 transition: transform 0.3s ease;
                 z-index: 1000;
                 background: white;
-                overflow-y: auto;
+                overflow-y: hidden; /* Remove scroll from parent */
             }
 
             .left-panel.active {
                 transform: translateX(0);
+            }
+
+            .panel-content {
+                padding-bottom: 70px; /* Extra space for footer */
             }
 
             .map-container {
@@ -82,7 +86,12 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
-                padding: 15px;
+                padding: 10px 15px;
+                margin: 0;
+            }
+
+            .stat-card {
+                padding: 10px;
             }
 
             .search-section {
@@ -92,13 +101,19 @@
             .auth-buttons {
                 flex-direction: column;
                 gap: 10px;
-                padding: 15px;
+                padding: 10px 15px;
+                margin-top: auto;
             }
 
             .footer {
-                position: relative;
-                padding: 15px;
-                margin-top: auto;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 10px 15px;
+                border-top: 1px solid #edf2f7;
+                z-index: 1;
             }
 
             .logo {
@@ -165,6 +180,93 @@
         .suggestion-item:last-child {
             border-bottom: none;
         }
+
+        /* Update left-panel to use flex properly */
+        .left-panel {
+            width: 320px;
+            background: white;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            height: 100vh;
+        }
+
+        /* Add a content wrapper */
+        .panel-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto; /* Move scroll to panel-content */
+            padding-bottom: 20px; /* Add padding for scroll space */
+        }
+
+        /* Update auth buttons */
+        .auth-buttons {
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: auto; /* Push to bottom of panel-content */
+        }
+
+        /* Fix button styles */
+        .dashboard-button, .logout-button, .login-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .dashboard-button {
+            background: #3182ce;
+            color: white;
+        }
+
+        .logout-button {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .login-button {
+            background: #3182ce;
+            color: white;
+        }
+
+        .dashboard-button:hover, .login-button:hover {
+            background: #2c5282;
+            transform: translateY(-1px);
+        }
+
+        .logout-button:hover {
+            background: #c53030;
+            transform: translateY(-1px);
+        }
+
+        /* Update footer */
+        .footer {
+            padding: 15px;
+            font-size: 12px;
+            color: #718096;
+            text-align: center;
+            border-top: 1px solid #edf2f7;
+            background: white;
+            margin-top: 10px;
+        }
+
+        .footer a {
+            color: #4a5568;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -175,71 +277,73 @@
 
     <div class="container">
         <div class="left-panel">
-            <div class="logo">
-                <img src="{% static 'css/images/treeforlifelogo.png' %}" alt="TreeForLife Logo">
-            </div>
-        
-            <div class="search-section">
-                <div class="search-box">
-                    <input type="text" 
-                           class="search-input" 
-                           placeholder="Search plantations...">
-                    <div class="search-suggestions"></div>
-                    <small class="search-help">
-                        <i>Tip: Search by plantation ID (TFL001), name, state or owner</i>
-                    </small>
+            <div class="panel-content">
+                <div class="logo">
+                    <img src="{% static 'css/images/treeforlifelogo.png' %}" alt="TreeForLife Logo">
                 </div>
-            </div>
-        
-            <div class="stats-grid">
+            
+                <div class="search-section">
+                    <div class="search-box">
+                        <input type="text" 
+                               class="search-input" 
+                               placeholder="Search plantations...">
+                        <div class="search-suggestions"></div>
+                        <small class="search-help">
+                            <i>Search by plantation name, state, owner or plantation ID</i>
+                        </small>
+                    </div>
+                </div>
+            
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">{{ stats.states_count }}</div>
-                        <div class="stat-label">States</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">{{ stats.plantations_count }}</div>
-                        <div class="stat-label">Plantations</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">{{ stats.owners_count }}</div>
-                        <div class="stat-label">Owners</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">{{ stats.companies_count }}</div>
-                        <div class="stat-label">Companies</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ stats.states_count }}</div>
+                            <div class="stat-label">States</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ stats.plantations_count }}</div>
+                            <div class="stat-label">Plantations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ stats.owners_count }}</div>
+                            <div class="stat-label">Owners</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ stats.companies_count }}</div>
+                            <div class="stat-label">Companies</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        
-            <div class="map-toggle">
-                <span>Detailed Map</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" class="toggle-input" id="mapStyleToggle">
-                    <span class="toggle-slider"></span>
-                </label>
-                <span>Focus Mode</span>
-            </div>
-
-
-            <button class="reset-button" id="resetButton">
-                <span>↺</span> Reset Filter & Map
-            </button>
-
-            {% if user.is_authenticated %}
-                <div class="auth-buttons">
-                    <a href="{% url 'owner_details' username=user.username %}" class="dashboard-button">
-                        My Dashboard →
-                    </a>
-                    <a href="{% url 'logout' %}" class="logout-button">
-                        Logout <i class="bi bi-box-arrow-right"></i>
-                    </a>
+            
+                <div class="map-toggle">
+                    <span>Detailed Map</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" class="toggle-input" id="mapStyleToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Focus Mode</span>
                 </div>
-            {% else %}
-                <a href="{% url 'login' %}" class="login-button">
-                    Login to Portal →
-                </a>
-            {% endif %}
+
+
+                <button class="reset-button" id="resetButton" style="margin-top: 5px; margin-bottom: 5px;;">
+                    <span>↺</span> Reset Filter & Map
+                </button>
+
+                {% if user.is_authenticated %}
+                    <div class="auth-buttons">
+                        <a href="{% url 'owner_details' username=user.username %}" class="dashboard-button">
+                            My Dashboard →
+                        </a>
+                        <a href="{% url 'logout' %}" class="logout-button">
+                            Logout <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="login-button">
+                        Login to Portal →
+                    </a>
+                {% endif %}
+            </div>
             
         
             <div class="footer">
