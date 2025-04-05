@@ -3,145 +3,192 @@
 {% block title %}{{ plantation.name|capfirst }} - Plantation Details{% endblock %}
 
 {% block content %}
+<!-- Add page-level styles -->
+<style>
+    /* Card styles */
+    .plantation-info-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .plantation-image img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .info-group {
+        margin-bottom: 12px;
+        color: #4a5568;
+    }
+
+    .timeline-detail-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 24px;
+    }
+
+    .timeline-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .timeline-date {
+        color: #718096;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .timeline-title {
+        font-size: 18px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .timeline-desc {
+        color: #4a5568;
+        margin-bottom: 0;
+    }
+
+    .date-badge {
+        background: #f7fafc;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #4a5568;
+    }
+
+    @media (max-width: 768px) {
+        .timeline-card {
+            flex-direction: column;
+        }
+        
+        .plantation-image img {
+            height: 160px;
+        }
+    }
+</style>
+
 <div class="container mt-4">
     <div class="row">
-        <!-- Plantation Info Sidebar -->
-        <div class="col-md-3">
-            <div class="plantation-info-card mb-4">
+        <!-- Left Column -->
+        <div class="col-md-3 mb-4">
+            <div class="plantation-info-card" style="margin-bottom: 20px;">
                 <div class="plantation-image">
-                    <a href="{{ plantation.image.url }}" target="_blank" title="View full image">
-                        <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}">
+                    <a href="{{ plantation.image.url }}" target="_blank">
+                        <img src="{{ plantation.image.url }}" alt="{{ plantation.name }}" style="width: 100%; height: 200px; object-fit: cover;">
                     </a>
                 </div>
-                <div class="plantation-details">
-                    <h3>{{ plantation.name|capfirst }}</h3>
-                    <div class="info-group">
+                <div style="padding: 20px;">
+                    <h3 style="margin-bottom: 15px; color: #2d3748; font-size: 1.5rem;">{{ plantation.name|capfirst }}</h3>
+                    <div style="display: flex; align-items: center; gap: 8px;">
                         <i class="bi bi-person-circle"></i>
-                        <a href="{% url 'owner_details' username=plantation.owner.username %}">
+                        <a href="{% url 'owner_details' username=plantation.owner.username %}" style="color: #3182ce; text-decoration: none;">
                             {{ plantation.owner.username|capfirst }}
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Info card moved outside -->
-            
-
-
             <div class="info-card">
-              <div class="info-group">
-                <p><i class="bi bi-upc"></i> | {{ plantation.plantation_id }}</p>
-              </div>
-              <div class="info-group">
-                <p><i class="bi bi-geo-alt"></i> | <a href="https://www.google.com/maps/search/?api=1&query={{ plantation.latitude }},{{ plantation.longitude }}" 
-                  target="_blank" title="View on Google Maps">View on Map</a></p>
-              </div>
-              <div class="info-group">
-                <p><i class="bi bi-map"></i> | {{ plantation.state|capfirst }}</p>
-              </div>
-              <div class="info-group">
-                <p><i class="bi bi-globe"></i> | India</p>
-              </div>
-          </div>
-
-
-            <!-- Action buttons with inline styles -->
-<div class="action-buttons" style="display: flex; flex-direction: column; gap: 8px; margin: 0px 0; padding: 0;">
-    {% if plantation.owner == request.user %}
-        <a href="{% url 'view_certificate' plantation.id %}" class="btn btn-primary" 
-           style="width: 100%; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; font-weight: 500;">
-            <i class="bi bi-award" style="font-size: 1rem;"></i> View Certificate
-        </a>
-    
-        {% if pending_request %}
-            <button type="button" class="btn btn-warning" 
-                    style="width: 100%; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; font-weight: 500;"
-                    data-bs-toggle="modal" data-bs-target="#pendingRequestModal">
-                <i class="bi bi-hourglass-split" style="font-size: 1rem;"></i> Visit Request Pending
-            </button>
-        {% else %}
-            <a href="{% url 'book_visit' plantation.id %}" class="btn btn-book-appointment"
-               style="width: 100%; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; font-weight: 500;">
-                <i class="bi bi-calendar2-plus" style="font-size: 1rem;"></i> Book Appointment
-            </a>
-        {% endif %}
-    {% endif %}
-</div>
-
-                    
-            
-
-
-        </div>
-
-
-
-        
-  
-
-
-
-        <!-- Timeline Content -->
-        <div class="col-md-9">
-
-
-
-
-            <div class="timeline-detail-card">
-                <div class="timeline-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4><i class="bi bi-clock-history"></i> Timeline Activities</h4>
-                        <span class="date-badge">
-                            <i class="bi bi-calendar3"></i> {{ plantation.plantation_date|date:"F j, Y" }}
-                        </span>
-                    </div>
+                <div class="info-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <i class="bi bi-upc"></i>
+                    <span>{{ plantation.plantation_id }}</span>
                 </div>
-
-                <div class="timeline-content">
-                    <div class="timeline-list">
-                        {% for timeline in timelines %}
-                            <div class="timeline-card {% if forloop.first %}latest-timeline{% endif %}">
-                                <div class="">
-                                    <span class="timeline-date" >
-                                        <i class="bi bi-calendar3"></i> {{ timeline.activity_date|date:"F j, Y" }}
-                                    </span>
-                                    <h4 class="timeline-title">
-                                        {% if forloop.first %}
-                                        <span class="ripple-wrapper">
-                                            <i class="bi bi-activity"></i>
-                                            <span class="ripple"></span>
-                                        </span>
-                                        {% else %}
-                                        <i class="bi bi-activity"></i>
-                                        {% endif %}
-                                        {{ timeline.activity_title|capfirst }}
-                                    </h4>
-                                    <p class="timeline-desc">{{ timeline.description|truncatewords:8 }}</p>
-                                </div>
-                                <a href="{% url 'timeline_details' plantation_id=plantation.id timeline_id=timeline.id %}" 
-                                   class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-arrow-right-circle"></i> Read More
-                                </a>
-                            </div>
-                        {% empty %}
-                            <div class="empty-state">
-                                <i class="bi bi-calendar-x"></i>
-                                <p>No timelines available for this plantation.</p>
-                            </div>
-                        {% endfor %}
-                    </div>
+                <div class="info-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <i class="bi bi-geo-alt"></i>
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ plantation.latitude }},{{ plantation.longitude }}" 
+                       target="_blank" style="color: #3182ce; text-decoration: none;">View on Map</a>
+                </div>
+                <div class="info-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <i class="bi bi-map"></i>
+                    <span>{{ plantation.state|capfirst }}</span>
+                </div>
+                <div class="info-group" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-globe"></i>
+                    <span>India</span>
                 </div>
             </div>
 
+            <!-- Action Buttons -->
+            {% if plantation.owner == request.user %}
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="{% url 'view_certificate' plantation.id %}" class="btn btn-primary d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-award"></i> View Certificate
+                </a>
+                
+                {% if pending_request %}
+                <button type="button" class="btn btn-warning d-flex align-items-center justify-content-center gap-2"
+                        data-bs-toggle="modal" data-bs-target="#pendingRequestModal">
+                    <i class="bi bi-hourglass-split"></i> Visit Request Pending
+                </button>
+                {% else %}
+                <a href="{% url 'book_visit' plantation.id %}" class="btn btn-success d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-calendar2-plus"></i> Book Appointment
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
 
+        <!-- Right Column -->
+        <div class="col-md-9">
+            <div class="timeline-detail-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h4 style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                        <i class="bi bi-clock-history"></i> Timeline Activities
+                    </h4>
+                    <span class="date-badge">
+                        <i class="bi bi-calendar3"></i> {{ plantation.plantation_date|date:"F j, Y" }}
+                    </span>
+                </div>
 
-
-
-
-
-
-
-
+                <div class="timeline-list">
+                    {% for timeline in timelines %}
+                    <div class="timeline-card" style="background: {% if forloop.first %}#f7fafc{% else %}white{% endif %};">
+                        <div>
+                            <span class="timeline-date">
+                                <i class="bi bi-calendar3"></i> {{ timeline.activity_date|date:"F j, Y" }}
+                            </span>
+                            <h4 class="timeline-title">
+                                <i class="bi bi-activity" style="color: {% if forloop.first %}#3182ce{% else %}#718096{% endif %};"></i>
+                                {{ timeline.activity_title|capfirst }}
+                            </h4>
+                            <p class="timeline-desc">{{ timeline.description|truncatewords:8 }}</p>
+                        </div>
+                        <a href="{% url 'timeline_details' plantation_id=plantation.id timeline_id=timeline.id %}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-arrow-right-circle"></i> Read More
+                        </a>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; padding: 40px 20px; color: #718096;">
+                        <i class="bi bi-calendar-x" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p style="margin: 0;">No timelines available for this plantation.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
