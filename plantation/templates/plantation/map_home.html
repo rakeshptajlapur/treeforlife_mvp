@@ -1,16 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load static %}  <!-- Add this line at the top -->
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TreeForLife - Plantation Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/map-home.css' %}">
+    <style>
+        /* Base Styles */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;          /* Changed from top to bottom */
+            right: 20px;           /* Changed from left to right */
+            z-index: 2000;
+            background: #2c3e50;   /* Darker background */
+            border: none;
+            border-radius: 50%;    /* Make it circular */
+            width: 56px;           /* Slightly larger */
+            height: 56px;          /* Slightly larger */
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
+        .toggle-icon {
+            font-size: 24px;
+            color: white;         /* White icon */
+        }
+
+        /* Hover effect */
+        .sidebar-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Active state */
+        .sidebar-toggle.active {
+            background: #e74c3c;  /* Different color when sidebar is open */
+        }
+
+        /* Mobile Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .left-panel {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 85%;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+                background: white;
+                overflow-y: auto;
+            }
+
+            .left-panel.active {
+                transform: translateX(0);
+            }
+
+            .map-container {
+                width: 100%;
+                height: 100vh;
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .search-section {
+                padding: 15px;
+            }
+
+            .auth-buttons {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .footer {
+                position: relative;
+                padding: 15px;
+                margin-top: auto;
+            }
+
+            .logo {
+                padding: 15px;
+            }
+
+            .logo img {
+                max-width: 180px;
+            }
+        }
+    </style>
 </head>
 <body>
+<!-- Update the toggle button HTML -->
+<button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle Sidebar">
+    <span class="toggle-icon">≡</span>
+</button>
+
     <div class="container">
         <div class="left-panel">
             <div class="logo">
@@ -88,13 +194,56 @@
         </div>
     </div>
 
-<!-- Add this right before the map-home.js script -->
-<script>
-    // Pass Django template data to JavaScript
-    window.plantationData = {{ plantation_data|safe }};
-</script>
+    <script>
+        window.plantationData = {{ plantation_data|safe }};
+        
+        // Mobile sidebar toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const leftPanel = document.querySelector('.left-panel');
+            const mapContainer = document.querySelector('.map-container');
+
+            // Initialize toggle state
+            if (window.innerWidth <= 768) {
+                sidebarToggle.style.display = 'flex';
+            }
+
+            // Toggle sidebar
+            sidebarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                leftPanel.classList.toggle('active');
+                setTimeout(() => {
+                    window.map.invalidateSize();
+                }, 300);
+            });
+
+            // Close sidebar when clicking on map
+            mapContainer.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && leftPanel.classList.contains('active')) {
+                    leftPanel.classList.remove('active');
+                    setTimeout(() => {
+                        window.map.invalidateSize();
+                    }, 300);
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                sidebarToggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+                if (window.innerWidth > 768) {
+                    leftPanel.classList.remove('active');
+                }
+                window.map.invalidateSize();
+            });
+
+            // Prevent map clicks from closing sidebar when clicking sidebar
+            leftPanel.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        });
+    </script>
+
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="{% static 'js/map-home.js' %}"></script>
-
 </body>
 </html>
