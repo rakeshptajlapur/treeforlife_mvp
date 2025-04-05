@@ -4,82 +4,212 @@
 {% block title %}Manage Employees{% endblock %}
 
 {% block content %}
-<div class="corporate-dashboard" style="padding: 24px; max-width: 1400px; margin: 0 auto; background: #f8fafc;">
+<style>
+    /* Base styles */
+    .corporate-dashboard {
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+        background: #f8fafc;
+    }
+
+    /* Header Styles */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Stats Badge */
+    .stats-badge {
+        display: flex;
+        gap: 12px;
+    }
+
+    .stat-item {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Table Styles */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Action Bar Styles */
+    .action-bar {
+        background: white;
+        border-radius: 12px;
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .export-import-buttons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .corporate-dashboard {
+            padding: 12px;
+        }
+
+        .page-header {
+            flex-direction: column;
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .stats-badge {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .stat-item {
+            justify-content: center;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .export-import-buttons {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 8px;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Table Adjustments */
+        .table thead {
+            display: none;
+        }
+
+        .table tbody tr {
+            display: block;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0 !important;
+            border: none !important;
+        }
+
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        /* Modal Adjustments */
+        .modal-dialog {
+            margin: 16px;
+        }
+
+        .modal-body {
+            padding: 16px;
+        }
+    }
+</style>
+
+<div class="corporate-dashboard">
     <!-- Page Header -->
-    <div class="page-header" style="background: white; border-radius: 12px; padding: 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <div class="page-header">
         <div class="header-content">
             <h4 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
                 <i class="bi bi-people"></i> Manage Employees
             </h4>
             <p style="margin: 8px 0 0; color: #64748b;">Manage your organization's employees</p>
         </div>
-        <div class="stats-badge" style="display: flex; gap: 12px;">
-            <span style="background: #EEF2FF; color: #474bff; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+        <div class="stats-badge">
+            <span class="stat-item" style="background: #EEF2FF; color: #474bff;">
                 <i class="bi bi-person-badge"></i> Credits: {{ corporate.employee_credits }}
             </span>
-            <span style="background: #ECFDF5; color: #2ecc71; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+            <span class="stat-item" style="background: #ECFDF5; color: #2ecc71;">
                 <i class="bi bi-people-fill"></i> Active: {{ employees.count }}
             </span>
         </div>
     </div>
 
     <!-- Action Bar -->
-    <div class="action-bar" style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <a href="{% url 'add_employee' %}" class="btn" style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;">
-                    <i class="bi bi-plus-circle"></i> Add Employee
+    <div class="action-bar">
+        <div class="action-buttons">
+            <a href="{% url 'add_employee' %}" class="btn" 
+               style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white;">
+                <i class="bi bi-plus-circle"></i> Add Employee
+            </a>
+            <div class="export-import-buttons">
+                <a href="{% url 'export_employees' %}" class="btn" 
+                   style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white;">
+                    <i class="bi bi-download"></i> Export
                 </a>
-            </div>
-            <div class="col-md-6 text-end">
-                <a href="{% url 'export_employees' %}" class="btn" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; margin-right: 8px;">
-                    <i class="bi bi-download"></i> Export Employees
-                </a>
-                <button class="btn" data-bs-toggle="modal" data-bs-target="#importModal" style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white; border: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;">
-                    <i class="bi bi-upload"></i> Import Employees
+                <button class="btn" data-bs-toggle="modal" data-bs-target="#importModal" 
+                        style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white;">
+                    <i class="bi bi-upload"></i> Import
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Employees Table -->
-    <div class="table-container" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <table class="table" style="margin-bottom: 0;">
-            <thead style="background: linear-gradient(45deg, #474bff, #bc48ff); color: white;">
-                <tr>
-                    <th style="padding: 16px; font-weight: 500; border: none;">#</th>
-                    <th style="padding: 16px; font-weight: 500; border: none;">
-                        <i class="bi bi-person"></i> Username
-                    </th>
-                    <th style="padding: 16px; font-weight: 500; border: none;">
-                        <i class="bi bi-envelope"></i> Email
-                    </th>
-                    <th style="padding: 16px; font-weight: 500; border: none;">
-                        <i class="bi bi-tree"></i> Plantation Status
-                    </th>
-                    <th style="padding: 16px; font-weight: 500; border: none; width: 100px;">
-                        <i class="bi bi-gear"></i> Actions
-                    </th>
-                </tr>
-            </thead>
+    <!-- Table Container -->
+    <div class="table-responsive">
+        <table class="table">
             <tbody>
                 {% for emp in employees %}
-                <tr style="transition: background 0.2s ease;">
-                    <td style="padding: 16px; vertical-align: middle;">{{ forloop.counter }}</td>
-                    <td style="padding: 16px; vertical-align: middle;">{{ emp.user.username }}</td>
-                    <td style="padding: 16px; vertical-align: middle;">{{ emp.user.email }}</td>
-                    <td style="padding: 16px; vertical-align: middle;">
+                <tr>
+                    <td data-label="#">{{ forloop.counter }}</td>
+                    <td data-label="Username">{{ emp.user.username }}</td>
+                    <td data-label="Email">{{ emp.user.email }}</td>
+                    <td data-label="Status">
                         {% if emp.user.plantation_set.count > 0 %}
-                        <span style="background: #ECFDF5; color: #2ecc71; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 4px;">
+                        <span class="status-badge active">
                             <i class="bi bi-check-circle"></i> Active ({{ emp.user.plantation_set.count }})
                         </span>
                         {% else %}
-                        <span style="background: #FEF3C7; color: #D97706; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 4px;">
+                        <span class="status-badge inactive">
                             <i class="bi bi-dash-circle"></i> No Plantations
                         </span>
                         {% endif %}
                     </td>
-                    <td style="padding: 16px; vertical-align: middle;">
+                    <td data-label="Actions">
                         {% if emp.user.plantation_set.count == 0 %}
                         <a href="{% url 'delete_employee' emp.id %}" class="btn" style="background: #FEE2E2; color: #EF4444; border: none; width: 32px; height: 32px; padding: 0; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;">
                             <i class="bi bi-trash"></i>
