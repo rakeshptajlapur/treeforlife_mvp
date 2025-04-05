@@ -4,51 +4,199 @@
 {% block title %}Owner Details - TreeForLife{% endblock %}
 
 {% block content %}
-<div class="owner-details-container">
-    <h2><i class="bi bi-person-circle"></i> Owner Details</h2>
-    <p><strong><i class="bi bi-person"></i> Name:</strong> {{ owner.username|title }}</p>
-    {% if user.is_authenticated and owner == user %}
-        <p><strong><i class="bi bi-envelope"></i> Email:</strong> {{ owner.email }}</p>
-    {% endif %}
+<style>
+    /* Owner Profile Card */
+    .profile-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 24px;
+        margin-bottom: 32px;
+    }
 
-    <h3><i class="bi bi-tree"></i> Plantations</h3>
+    .profile-title {
+        font-size: 1.5rem;
+        color: #2d3748;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .profile-info {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        color: #4a5568;
+    }
+
+    /* Section Headers */
+    .section-title {
+        font-size: 1.25rem;
+        color: #2d3748;
+        margin: 32px 0 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Responsive Table Styles */
+    .table-wrapper {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 32px;
+    }
+
+    .responsive-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .responsive-table th {
+        background: #f8fafc;
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #4a5568;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .responsive-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+
+    .responsive-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Mobile Responsive Design */
+    @media (max-width: 768px) {
+        .table-wrapper {
+            border-radius: 8px;
+            margin: 0 -12px;  /* Negative margin for full width */
+        }
+
+        .responsive-table {
+            display: block;
+        }
+
+        .responsive-table thead {
+            display: none;  /* Hide headers on mobile */
+        }
+
+        .responsive-table tbody {
+            display: block;
+        }
+
+        .responsive-table tr {
+            display: block;
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .responsive-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .responsive-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border: none;
+        }
+
+        .responsive-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .profile-card {
+            margin: 0 -12px 24px;
+            border-radius: 0;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- Profile Card -->
+    <div class="profile-card">
+        <h2 class="profile-title">
+            <i class="bi bi-person-circle"></i>
+            Owner Details
+        </h2>
+        <div class="profile-info">
+            <p class="mb-0">
+                <strong><i class="bi bi-person"></i> Name:</strong> 
+                {{ owner.username|title }}
+            </p>
+            {% if user.is_authenticated and owner == user %}
+                <p class="mb-0">
+                    <strong><i class="bi bi-envelope"></i> Email:</strong> 
+                    {{ owner.email }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Plantations Section -->
+    <h3 class="section-title">
+        <i class="bi bi-tree"></i> Plantations
+    </h3>
     {% if plantations %}
-        <div class="table-container">
-            <table>
+        <div class="table-wrapper">
+            <table class="responsive-table">
                 <thead>
                     <tr>
-                        <th><i class="bi bi-hash"></i> SL</th>
-                        <th><i class="bi bi-upc"></i> Plantation ID</th>
-                        <th><i class="bi bi-flower1"></i> Plant Name</th>
-                        <th><i class="bi bi-geo-alt"></i> Coordinates</th>
-                        <th><i class="bi bi-map"></i> State</th>
-                        <th><i class="bi bi-calendar3"></i> Plantation Date</th>
-                        <th><i class="bi bi-award"></i> Certificate</th>
+                        <th>SL</th>
+                        <th>Plantation ID</th>
+                        <th>Plant Name</th>
+                        <th>Location</th>
+                        <th>State</th>
+                        <th>Date</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for plantation in plantations %}
                         <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ plantation.plantation_id }}</td>
-                            <td>
-                                <a href="{% url 'plantation_details' plantation.id %}">
+                            <td data-label="SL">{{ forloop.counter }}</td>
+                            <td data-label="Plantation ID">{{ plantation.plantation_id }}</td>
+                            <td data-label="Plant Name">
+                                <a href="{% url 'plantation_details' plantation.id %}" 
+                                   class="text-primary text-decoration-none">
                                     <i class="bi bi-link-45deg"></i> {{ plantation.name }}
                                 </a>
                             </td>
-                            <td>
+                            <td data-label="Location">
                                 <a href="https://www.google.com/maps/search/?api=1&query={{ plantation.latitude }},{{ plantation.longitude }}" 
                                    target="_blank" 
-                                   title="View on Google Maps">
-                                    <i class="bi bi-geo-alt"></i> {{ plantation.latitude }}, {{ plantation.longitude }}
+                                   class="text-primary text-decoration-none">
+                                    <i class="bi bi-geo-alt"></i> View Map
                                 </a>
                             </td>
-                            <td>{{ plantation.state }}</td>
-                            <td>{{ plantation.plantation_date|date:"F j, Y" }}</td>
-                            <td>
+                            <td data-label="State">{{ plantation.state }}</td>
+                            <td data-label="Date">{{ plantation.plantation_date|date:"M j, Y" }}</td>
+                            <td data-label="Action">
                                 {% if user.is_authenticated and owner == user %}
-                                    <a href="{% url 'view_certificate' plantation.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-file-earmark-text"></i> View
+                                    <a href="{% url 'view_certificate' plantation.id %}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark-text"></i> Certificate
                                     </a>
                                 {% endif %}
                             </td>
@@ -58,33 +206,38 @@
             </table>
         </div>
     {% else %}
-        <p><i class="bi bi-exclamation-circle"></i> No plantations found.</p>
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No plantations found.
+        </div>
     {% endif %}
 
+    <!-- Visit Requests Section -->
     {% if user.is_authenticated and owner == user %}
-        <h3><i class="bi bi-calendar-check"></i> My Visit Requests</h3>
+        <h3 class="section-title">
+            <i class="bi bi-calendar-check"></i> My Visit Requests
+        </h3>
         {% if visit_requests %}
-            <div class="table-container">
-                <table>
+            <div class="table-wrapper">
+                <table class="responsive-table">
                     <thead>
                         <tr>
-                            <th><i class="bi bi-upc"></i> Plantation ID</th>
-                            <th><i class="bi bi-flower1"></i> Plantation</th>
-                            <th><i class="bi bi-calendar-event"></i> Check-in</th>
-                            <th><i class="bi bi-calendar-x"></i> Check-out</th>
-                            <th><i class="bi bi-people"></i> Visitors</th>
-                            <th><i class="bi bi-clipboard-check"></i> Status</th>
+                            <th>Plantation ID</th>
+                            <th>Plantation</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Visitors</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for request in visit_requests %}
                             <tr>
-                                <td>{{ request.plantation.plantation_id }}</td>
-                                <td>{{ request.plantation.name }}</td>
-                                <td>{{ request.check_in_date }}</td>
-                                <td>{{ request.check_out_date }}</td>
-                                <td>{{ request.visitors }}</td>
-                                <td>
+                                <td data-label="Plantation ID">{{ request.plantation.plantation_id }}</td>
+                                <td data-label="Plantation">{{ request.plantation.name }}</td>
+                                <td data-label="Check-in">{{ request.check_in_date }}</td>
+                                <td data-label="Check-out">{{ request.check_out_date }}</td>
+                                <td data-label="Visitors">{{ request.visitors }}</td>
+                                <td data-label="Status">
                                     {% if request.status == 'Pending' %}
                                         <span class="badge bg-warning"><i class="bi bi-hourglass-split"></i> {{ request.status }}</span>
                                     {% elif request.status == 'Approved' %}
@@ -99,7 +252,9 @@
                 </table>
             </div>
         {% else %}
-            <p><i class="bi bi-info-circle"></i> No visit requests found.</p>
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No visit requests found.
+            </div>
         {% endif %}
     {% endif %}
 </div>
