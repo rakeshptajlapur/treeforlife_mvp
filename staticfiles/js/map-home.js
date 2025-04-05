@@ -28,25 +28,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.querySelector('.search-input');
     const suggestionsContainer = document.querySelector('.search-suggestions');
 
+    // Update search input placeholder
+    searchInput.placeholder = "Search by Plantation ID (TFL001), Name, or Location";
+
     searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
+        const searchTerm = e.target.value.toLowerCase().trim();
         
         if (searchTerm.length < 2) {
             suggestionsContainer.style.display = 'none';
             return;
         }
 
-        const matches = plantationData.filter(p => 
-            p.name.toLowerCase().includes(searchTerm) ||
-            p.state.toLowerCase().includes(searchTerm) ||
-            p.owner.toLowerCase().includes(searchTerm)
+        // Prioritize exact plantation ID matches
+        const exactMatches = plantationData.filter(p => 
+            p.plantation_id && p.plantation_id.toString().toLowerCase() === searchTerm
         );
 
+        const partialMatches = plantationData.filter(p => {
+            // Skip if it's an exact match
+            if (exactMatches.includes(p)) return false;
+            
+            return (
+                (p.plantation_id && p.plantation_id.toString().toLowerCase().includes(searchTerm)) ||
+                p.name.toLowerCase().includes(searchTerm) ||
+                p.state.toLowerCase().includes(searchTerm) ||
+                p.owner.toLowerCase().includes(searchTerm)
+            );
+        });
+
+        const matches = [...exactMatches, ...partialMatches];
+
+        // Update the matches HTML generation
         if (matches.length > 0) {
             suggestionsContainer.innerHTML = matches.map(p => `
                 <div class="suggestion-item" data-lat="${p.latitude}" data-lng="${p.longitude}">
-                    <strong>${p.name}</strong><br>
-                    <small>${p.state} | ${p.owner}</small>
+                    <div class="plantation-id">${p.plantation_id}</div>
                 </div>
             `).join('');
             suggestionsContainer.style.display = 'block';
@@ -62,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const lng = parseFloat(item.dataset.lng);
             map.setView([lat, lng], 15);
             suggestionsContainer.style.display = 'none';
-            searchInput.value = item.querySelector('strong').textContent;
+            searchInput.value = item.querySelector('.plantation-id').textContent;
         }
     });
 
@@ -81,61 +97,80 @@ document.addEventListener('DOMContentLoaded', function() {
             popupAnchor: [0, -16]
         });
     };
-                // Add markers with custom icon, tooltip, and popup
-        const markers = plantationData.map(plantation => {
-            if (!plantation.latitude || !plantation.longitude) {
-                console.warn(`Missing coordinates for plantation: ${plantation.name}`);
-                return null;
-            }
 
-            try {
-                const marker = L.marker([plantation.latitude, plantation.longitude], {
-                    icon: createMarkerIcon()
-                }).addTo(map);
+    const createCustomMarker = () => {
+        return L.divIcon({
+            className: 'custom-marker',
+            html: `
+                <div class="marker-container">
+                    <div class="marker-pin"></div>
+                    <div class="marker-ripple"></div>
+                </div>
+            `,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            popupAnchor: [0, -16]
+        });
+    };
 
-                // Add hover tooltip (brief info)
-                marker.bindTooltip(`
-                    <div class="marker-tooltip">
-                        <strong>${plantation.name}</strong><br>
-                        ${plantation.state}
+    // Add markers with custom icon, tooltip, and popup
+    plantationData.forEach(plantation => {
+        if (!plantation.latitude || !plantation.longitude) {
+            console.warn(`Missing coordinates for plantation: ${plantation.name}`);
+            return;
+        }
+
+        try {
+            const marker = L.marker([plantation.latitude, plantation.longitude], {
+                icon: createCustomMarker()
+            }).addTo(map);
+
+            // Update tooltip content with ID
+            marker.bindTooltip(`
+                <div class="marker-tooltip">
+                    <div class="tooltip-content">
+                        <div class="tooltip-plantation-id">${plantation.plantation_id}</div>
+                        <div class="tooltip-title">${plantation.name}</div>
+                        <div class="tooltip-details">
+                            <p>${plantation.state}</p>
+                            <p>${plantation.owner}</p>
+                        </div>
                     </div>
-                `, {
-                    direction: 'top',
-                    offset: [0, -20],
-                    permanent: false
-                });
+                </div>
+            `, {
+                direction: 'top',
+                offset: [0, -10],
+                className: 'custom-tooltip'
+            });
 
-                // Add clickable popup (detailed info)
-                marker.bindPopup(`
-                    <div class="marker-popup">
-                        <h4>${plantation.name}</h4>
-                        <p><strong>ID:</strong> ${plantation.plantation_id}</p>
-                        <p><strong>Location:</strong> ${plantation.latitude}, ${plantation.longitude}</p>
-                        <p><strong>State:</strong> ${plantation.state}</p>
-                        <p><strong>Owner:</strong> ${plantation.owner}</p>
-                        ${plantation.company ? `<p><strong>Company:</strong> ${plantation.company}</p>` : ''}
-                        <a href="/plantation-details/${plantation.id}/" class="popup-link">
-                            View Plantation Details →
-                        </a>
-                    </div>
-                `, {
-                    maxWidth: 320,
-                    className: 'custom-popup',
-                    closeButton: true
-                });
+            // Add clickable popup (detailed info)
+            marker.bindPopup(`
+                <div class="marker-popup">
+                    <h4>${plantation.name}</h4>
+                    <p><strong>ID:</strong> ${plantation.plantation_id}</p>
+                    <p><strong>Location:</strong> ${plantation.latitude}, ${plantation.longitude}</p>
+                    <p><strong>State:</strong> ${plantation.state}</p>
+                    <p><strong>Owner:</strong> ${plantation.owner}</p>
+                    ${plantation.company ? `<p><strong>Company:</strong> ${plantation.company}</p>` : ''}
+                    <a href="/plantation-details/${plantation.id}/" class="popup-link">
+                        View Plantation Details →
+                    </a>
+                </div>
+            `, {
+                maxWidth: 320,
+                className: 'custom-popup',
+                closeButton: true
+            });
 
-                // Handle marker click
-                marker.on('click', function(e) {
-                    // Close any other open popups
-                    map.closeTooltip();
-                });
-
-                return marker;
-            } catch (error) {
-                console.error(`Error creating marker for plantation: ${plantation.name}`, error);
-                return null;
-            }
-        }).filter(Boolean);
+            // Handle marker click
+            marker.on('click', function(e) {
+                // Close any other open popups
+                map.closeTooltip();
+            });
+        } catch (error) {
+            console.error(`Error creating marker for plantation: ${plantation.name}`, error);
+        }
+    });
 
     // Map style toggle
     const mapStyleToggle = document.getElementById('mapStyleToggle');

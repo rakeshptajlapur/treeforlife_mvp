@@ -135,6 +135,7 @@ def view_certificate(request, plantation_id):
         'plantation_date': plantation.plantation_date,
         'issuance_date': plantation.plantation_date,  # Assuming both dates are the same
         # Add any additional fields as needed.
+        'plantation_id': plantation_id,  # Add this line
     }
     
     return render(request, 'plantation/certificate.html', context)

@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <title>Certificate of Appreciation</title>
   <style>
     body {
@@ -133,6 +134,129 @@
     .print-button:hover {
       background-color: #218838;
     }
+
+    /* Responsive styles */
+    @media screen and (max-width: 850px) {
+        .certificate-container {
+            width: 95%;
+            height: auto;
+            margin: 10px auto;
+            border-width: 3px;
+        }
+
+        .header-title {
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        .certificate-title {
+            font-size: 36px;
+        }
+
+        .sub-title {
+            font-size: 18px;
+        }
+
+        .owner-name {
+            font-size: 24px;
+        }
+
+        .plantation-info {
+            font-size: 16px;
+        }
+
+        .content-message {
+            font-size: 16px;
+            margin: 10px 20px;
+        }
+
+        .footer {
+            padding: 0 10px 10px;
+            margin-bottom: 15px;
+        }
+
+        .logo-section img {
+            max-width: 60px;
+        }
+
+        .signature-section img {
+            max-width: 100px;
+        }
+    }
+
+    /* Action Buttons Container */
+    .action-buttons {
+        text-align: center;
+        margin: 20px 0 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .print-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        font-size: 16px;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .print-button:hover, .back-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .back-button:hover {
+        background-color: #0056b3;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .print-button:hover {
+        background-color: #218838;
+    }
+
+    @media print {
+        .action-buttons {
+            display: none !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .action-buttons {
+            padding: 0 20px;
+        }
+
+        .print-button, .back-button {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .plantation-info{
+          margin-bottom: 25px;
+        }
+    }
   </style>
 </head>
 <body>
@@ -148,7 +272,7 @@
         <div class="certificate-title">Certificate of Appreciation</div>
         <div class="sub-title">Proudly Presented To</div>
         <div class="owner-name">{{ owner_name }}</div>
-        <div class="plantation-info">
+        <div class="plantation-info" >
           For owning the plantation <strong style="text-decoration: underline;">{{ plantation_name }}</strong>
         </div>
       </div>
@@ -170,16 +294,21 @@
           <div>treeforlife.net</div>
         </div>
         <div class="signature-section">
-          <img src="{% static 'css/images/treeforlifelogo.png' %}" alt="Signature">
+          <img src="{% static 'css/images/founder_sign.png' %}" alt="Signature">
           <div class="signer-name">Ankit Kadia, Founder</div>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- Print/Download Button -->
-  <div class="print-button-container">
-    <button class="print-button" onclick="window.print()">Print / Download Certificate</button>
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button class="print-button" onclick="window.print()">
+        <i class="bi bi-printer"></i> Print / Download Certificate
+    </button>
+    <a href="{% url 'plantation_details' plantation_id %}" class="back-button">
+        <i class="bi bi-arrow-left"></i> Back to Plantation
+    </a>
   </div>
 </body>
 </html>
