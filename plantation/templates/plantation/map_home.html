@@ -109,6 +109,62 @@
                 max-width: 180px;
             }
         }
+
+        /* Suggestion form css styling */
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f5f8fa;
+        }
+
+        .plantation-id {
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .suggestion-item {
+                padding: 12px 15px;  /* Slightly larger padding for touch */
+            }
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .search-help {
+            display: block;
+            color: #6b7280;
+            font-size: 12px;
+            margin-top: 6px;
+            padding-left: 4px;
+        }
+
+        .search-suggestions {
+            position: absolute;
+            width: 100%;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            margin-top: 4px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .suggestion-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
@@ -125,11 +181,14 @@
         
             <div class="search-section">
                 <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Search by ID, name, state, or owner...">
+                    <input type="text" 
+                           class="search-input" 
+                           placeholder="Search plantations...">
                     <div class="search-suggestions"></div>
+                    <small class="search-help">
+                        <i>Tip: Search by plantation ID (TFL001), name, state or owner</i>
+                    </small>
                 </div>
-                
-               
             </div>
         
             <div class="stats-grid">

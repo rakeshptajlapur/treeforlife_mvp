@@ -58,14 +58,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const matches = [...exactMatches, ...partialMatches];
 
+        // Update the matches HTML generation
         if (matches.length > 0) {
             suggestionsContainer.innerHTML = matches.map(p => `
                 <div class="suggestion-item" data-lat="${p.latitude}" data-lng="${p.longitude}">
                     <div class="plantation-id">${p.plantation_id}</div>
-                    <div class="plantation-details">
-                        <strong>${p.name}</strong><br>
-                        <small>${p.state} | ${p.owner}</small>
-                    </div>
                 </div>
             `).join('');
             suggestionsContainer.style.display = 'block';
