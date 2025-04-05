@@ -4,6 +4,157 @@
 {% block title %}Book Plantation Visit{% endblock %}
 
 {% block content %}
+<style>
+    /* Card Styles */
+    .booking-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        color: white;
+        padding: 24px;
+        border: none;
+    }
+
+    .card-body {
+        padding: 32px;
+    }
+
+    /* Info Items */
+    .readonly-info {
+        background: rgba(255,255,255,0.1);
+        padding: 16px;
+        border-radius: 8px;
+        margin-top: 16px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        color: rgba(255,255,255,0.9);
+        font-size: 14px;
+    }
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Form Styles */
+    .form-section {
+        margin-bottom: 32px;
+    }
+
+    .form-floating {
+        margin-bottom: 20px;
+    }
+
+    .form-floating > label {
+        padding-left: 24px;
+        color: #6c757d;
+    }
+
+    .form-floating > .form-control {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 12px 16px;
+        height: auto;
+        min-height: 58px;
+    }
+
+    .form-floating > .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.25rem rgba(52,152,219,0.25);
+    }
+
+    textarea.form-control {
+        min-height: 120px !important;
+    }
+
+    /* Button Styles */
+    .action-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: flex-end;
+    }
+
+    .btn-gradient-primary {
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-gradient-primary:hover {
+        background: linear-gradient(135deg, #34495e, #2980b9);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #eee;
+        padding: 16px 24px;
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #eee;
+        padding: 16px 24px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .booking-card {
+            border-radius: 0;
+            margin: -24px;
+        }
+
+        .card-header {
+            padding: 20px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .readonly-info {
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        .col-md-6 {
+            padding: 0;
+        }
+    }
+</style>
 
 <!-- ✅ Bootstrap Modal for Success/Error Messages -->
 <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
