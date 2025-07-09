@@ -25,7 +25,7 @@ import json
 from django.db.models import Count
 from django.db.models import Q  # Add this import at the top with other imports
 from django.core.serializers.json import DjangoJSONEncoder
-
+from plantation.tasks import send_email_task
 
 def send_email_async(subject, message, recipient_list):
     """Send email in a separate thread to avoid blocking the request."""
@@ -82,7 +82,7 @@ A new visit request has been submitted.
                 """
 
                 try:
-                    send_email_async(admin_subject, admin_message, [settings.ADMIN_EMAIL])
+                    send_email_task.delay(admin_subject, admin_message, [settings.ADMIN_EMAIL])
                 except Exception as admin_email_error:
                     messages.error(request, f"⚠️ Failed to notify admin: {admin_email_error}")
 
@@ -101,7 +101,7 @@ Best Regards,
 TreeForLife Team
                     """
                     try:
-                        send_email_async(owner_subject, owner_message, [plantation.owner.email])
+                        send_email_task.delay(owner_subject, owner_message, [plantation.owner.email])
                     except Exception as owner_email_error:
                         messages.error(request, f"⚠️ Failed to send thank-you email: {owner_email_error}")
 
