@@ -194,11 +194,9 @@
 
         /* Add a content wrapper */
         .panel-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto; /* Move scroll to panel-content */
-            padding-bottom: 20px; /* Add padding for scroll space */
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding-bottom: 10px;
         }
 
         /* Update auth buttons */
@@ -207,7 +205,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-top: auto; /* Push to bottom of panel-content */
+            background: white;
         }
 
         /* Fix button styles */
@@ -250,13 +248,17 @@
 
         /* Update footer */
         .footer {
+            flex-shrink: 0;
             padding: 15px;
             font-size: 12px;
             color: #718096;
             text-align: center;
             border-top: 1px solid #edf2f7;
             background: white;
-            margin-top: 10px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
         }
 
         .footer a {
@@ -329,33 +331,30 @@
                     <span>↺</span> Reset Filter & Map
                 </button>
 
-                {% if user.is_authenticated %}
-                    <div class="auth-buttons">
-                        <a href="{% url 'owner_details' username=user.username %}" class="dashboard-button">
-                            My Dashboard →
-                        </a>
-                        <a href="{% url 'logout' %}" class="logout-button">
-                            Logout <i class="bi bi-box-arrow-right"></i>
-                        </a>
-                    </div>
-                {% else %}
-                    <a href="{% url 'login' %}" class="login-button">
-                        Login to Portal →
-                    </a>
-                {% endif %}
             </div>
-            
-        
-            <div class="footer">
-                © TreeForLife.net | All Rights Reserved<br>
-                Developed by <a href="https://codesiddhi.agency" target="_blank">Codesiddhi Technologies</a>
+        {% if user.is_authenticated %}
+            <div class="auth-buttons">
+                <a href="{% url 'owner_details' username=user.username %}" class="dashboard-button">
+                    My Dashboard →
+                </a>
+                <a href="{% url 'logout' %}" class="logout-button">
+                    Logout <i class="bi bi-box-arrow-right"></i>
+                </a>
             </div>
-        </div>
-
-        <div class="map-container">
-            <div id="map"></div>
-        </div>
+        {% else %}
+            <div class="auth-buttons">
+                <a href="{% url 'login' %}" class="login-button">
+                    Login to Portal →
+                </a>
+            </div>
+           
+        {% endif %}
+      
     </div>
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+</div>
 
     <script>
         window.plantationData = {{ plantation_data|safe }};
