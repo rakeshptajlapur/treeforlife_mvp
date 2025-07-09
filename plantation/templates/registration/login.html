@@ -21,8 +21,9 @@
 
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                             {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endfor %}
                 {% endif %}
@@ -32,7 +33,7 @@
                     {% load form_extras %}
                     
                     <div class="form-group">
-                        <label for="id_username" class="form-label">Username</label>
+                        <label for="id_username" class="form-label">Username or Email</label>
                         {{ form.username|add_class:"form-input" }}
                     </div>
                     
@@ -52,10 +53,8 @@
                         <a href="{% url 'homepage' %}" class="forgot-link">
                             <i class="bi bi-house"></i> Go to Homepage
                         </a>
-                       
                     </div>
                     <div>
-                       
                     </div>
                 </form>
             </div>
@@ -87,25 +86,24 @@
             font-size: 1rem;
         }
 
-// Add this style block to each form's <style> section
-.home-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #6c757d;
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-    margin-top: 1rem;
-    transition: all 0.3s ease;
-}
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6c757d;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
 
-.home-link:hover {
-    background: #f8f9fa;
-    color: #0056b3;
-    border-color: #0056b3;
-}
+        .home-link:hover {
+            background: #f8f9fa;
+            color: #0056b3;
+            border-color: #0056b3;
+        }
     </style>
 </body>
 </html>
