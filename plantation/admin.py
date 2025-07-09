@@ -78,8 +78,8 @@ class PlantationAdminForm(ModelForm):
 @admin.register(Plantation)
 class PlantationAdmin(ImportExportMixin, admin.ModelAdmin):
     form = PlantationAdminForm
-    list_display = ('plantation_id', 'name', 'owner', 'corporate', 'created_at', 'updated_at', 'latitude', 'longitude', 'state')
-    search_fields = ('name', 'owner__username', 'owner__email', 'corporate__name', 'state')
+    list_display = ('plantation_id', 'name', 'owner', 'corporate', 'created_at', 'updated_at', 'latitude', 'longitude', 'state', 'gifted_by_name')
+    search_fields = ('name', 'owner__username', 'owner__email', 'corporate__name', 'state', 'gifted_by_name')
     list_filter = ('state', 'corporate', 'created_at')
     ordering = ('-created_at',)
     resource_class = PlantationResource
@@ -87,7 +87,7 @@ class PlantationAdmin(ImportExportMixin, admin.ModelAdmin):
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('plantation_id', 'name', 'owner', 'corporate', 'plantation_date', 'description')
+            'fields': ('plantation_id', 'name', 'owner', 'corporate', 'plantation_date', 'description', 'gifted_by_name')
         }),
         ('Location Details', {
             'fields': ('latitude', 'longitude', 'state')

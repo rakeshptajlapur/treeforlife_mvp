@@ -81,6 +81,7 @@ class Plantation(models.Model):
         ('Ladakh', 'Ladakh'),
     ]
     state = models.CharField(max_length=50, choices=STATE_CHOICES, null=True, blank=True)  # State dropdown
+    gifted_by_name = models.CharField(max_length=255, null=True, blank=True, help_text="Name of the person who gifted this plantation (optional)")
 
     def plantation_id(self):
         """Generate plantation ID in the format PLT-DDMMYY-ID."""

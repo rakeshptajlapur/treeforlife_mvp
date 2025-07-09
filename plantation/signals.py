@@ -145,12 +145,14 @@ TreeForLife Team
 def notify_plantation_assignment(sender, instance, **kwargs):
     try:
         old_instance = Plantation.objects.get(pk=instance.pk)
+        print(f"[DEBUG] Plantation pre_save: old_owner={old_instance.owner}, new_owner={instance.owner}, plantation_id={instance.id}")
         if old_instance.owner != instance.owner and instance.owner:
+            print(f"[DEBUG] Sending plantation assignment email to {instance.owner.email}")
             subject = f"New Plantation Assigned - {instance.name}"
             message = f"""
 Dear {instance.owner.username},
 
-You have been assigned as the owner of:
+you have been assigned as the owner of:
 
 Plantation Details:
 - Name: {instance.name}
@@ -164,8 +166,63 @@ Best Regards,
 TreeForLife Team
             """
             send_email_task.delay(subject, message, [instance.owner.email])
+        else:
+            print(f"[DEBUG] No owner change or owner missing for plantation_id={instance.id}")
     except Plantation.DoesNotExist:
+        print(f"[DEBUG] Plantation pre_save: new instance, no old instance for plantation_id={getattr(instance, 'id', None)}")
         pass
+
+# Notify plantation assignment on creation
+@receiver(post_save, sender=Plantation)
+def notify_plantation_assignment_on_create(sender, instance, created, **kwargs):
+    if created and instance.owner and instance.owner.email:
+        print(f"[DEBUG] Plantation post_save: sending assignment email to {instance.owner.email} for new plantation_id={instance.id}")
+        subject = f"New Plantation Assigned - {instance.name}"
+        message = f"""
+Dear {instance.owner.username},
+
+you have been assigned as the owner of:
+
+Plantation Details:
+- Name: {instance.name}
+- ID: {instance.plantation_id()}
+- Location: {instance.state}
+
+You can view your plantation details at:
+{settings.SITE_URL}/plantation-details/{instance.id}/
+
+Best Regards,
+TreeForLife Team
+        """
+        send_email_task.delay(subject, message, [instance.owner.email])
+
+# Dedicated gifting notification
+@receiver(post_save, sender=Plantation)
+def notify_gifted_plantation(sender, instance, created, **kwargs):
+    if instance.gifted_by_name and instance.owner and instance.owner.email:
+        print(f"[DEBUG] Sending gifting email to {instance.owner.email} (gifted_by_name={instance.gifted_by_name}) for plantation_id={instance.id}")
+        subject = f"Congratulations! {instance.gifted_by_name} has gifted you a plantation!"
+        reset_url = f"{settings.SITE_URL}/reset-password/"  # Adjust if you want to include a real reset link
+        message = f"""
+Dear {instance.owner.username},
+
+Congratulations! {instance.gifted_by_name} has gifted you a plantation!
+
+Details will be shared soon via email, or you can log in to your account at:
+{settings.SITE_URL}/login/
+using this email address: {instance.owner.email}
+
+If you don't have a password, you can reset it here:
+{reset_url}
+
+to check the plantation details directly.
+
+Best Regards,
+TreeForLife Team
+        """
+        send_email_task.delay(subject, message, [instance.owner.email])
+    else:
+        print(f"[DEBUG] Gifting notification not sent: gifted_by_name missing or owner/owner.email missing for plantation_id={instance.id}")
 
 # 7. Employee Creation Notification
 @receiver(post_save, sender=Employee)

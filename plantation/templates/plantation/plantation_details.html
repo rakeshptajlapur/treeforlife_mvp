@@ -137,6 +137,12 @@
                     <i class="bi bi-globe"></i>
                     <span>India</span>
                 </div>
+                {% if plantation.gifted_by_name %}
+                <div class="info-group" style="display: flex; align-items: center; gap: 8px; color: #2ecc71;">
+                    <i class="bi bi-gift"></i>
+                    <span>Gifted by: <strong>{{ plantation.gifted_by_name }}</strong></span>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Action Buttons -->
