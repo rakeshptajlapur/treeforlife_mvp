@@ -272,6 +272,15 @@
     </style>
 </head>
 <body>
+<!-- Inline Bootstrap Alerts for Django Messages -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3 mx-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
 <!-- Update the toggle button HTML -->
 <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle Sidebar">
     <span class="toggle-icon">≡</span>

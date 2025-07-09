@@ -156,29 +156,19 @@
     }
 </style>
 
-<!-- ✅ Bootstrap Modal for Success/Error Messages -->
-<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="statusModalLabel"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <span id="statusMessage"></span>
-            </div>
-            <div class="modal-footer">
-                <a href="{% url 'plantation_details' plantation.id %}" class="btn btn-primary">🌿 View Plantation</a>
-                <a href="{% url 'owner_details' user.username %}" class="btn btn-secondary">👤 My Profile</a>
-            </div>
-        </div>
-    </div>
-</div>
-
+<!-- Inline Bootstrap Alerts for Django Messages -->
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="booking-card">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3 mx-3" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
@@ -254,29 +244,5 @@
         </div>
     </div>
 </div>
-
-<!-- ✅ Handle Success/Error Messages in Modal -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        {% if messages %}
-            let messageType = "success"; // Default success
-            let modalTitle = "✅ Success";
-            let messageContent = "";
-
-            {% for message in messages %}
-                {% if 'error' in message.tags %}
-                    messageType = "danger"; // Override for error
-                    modalTitle = "❌ Error";
-                {% endif %}
-                messageContent += "{{ message }}<br>";
-            {% endfor %}
-
-            document.getElementById("statusModalLabel").innerHTML = modalTitle;
-            document.getElementById("statusMessage").innerHTML = messageContent;
-            let modal = new bootstrap.Modal(document.getElementById('statusModal'));
-            modal.show();
-        {% endif %}
-    });
-</script>
 
 {% endblock %}
