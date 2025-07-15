@@ -52,8 +52,8 @@ INSTALLED_APPS = [
     
     # Third-party apps
     
-    
-
+    # Add django_celery_results if using Django DB as broker
+    'django_celery_results',
 ]
 
 
@@ -87,7 +87,6 @@ TEMPLATES = [
         },
     },
 ]
-
 
 
 WSGI_APPLICATION = 'plant_booking.wsgi.application'
@@ -143,32 +142,23 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-#STATIC_URL = 'static/'
-STATIC_URL = '/static/'  # URL to access static files
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Include your static files folder
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
-
-
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 # Media files configuration
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 
+# For production, allow overriding via environment variables
+if not DEBUG:
+    STATIC_ROOT = os.getenv('STATIC_ROOT', STATIC_ROOT)
+    MEDIA_ROOT = os.getenv('MEDIA_ROOT', MEDIA_ROOT)
+
 LOGIN_REDIRECT_URL = '/'  # Redirect to homepage after login
 
 
-
-
-
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 
 # Email Configuration
@@ -182,14 +172,14 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_TIMEOUT = 30
 
 ADMIN_EMAIL = EMAIL_HOST_USER
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', 'contact@treeforlife.net')
 
 # Site URL Configuration
 SITE_URL = 'https://app.treeforlife.net' if not DEBUG else 'http://127.0.0.1:8080'
 
 # Celery Configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
